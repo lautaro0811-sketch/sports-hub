@@ -1,17 +1,23 @@
 Rails.application.routes.draw do
-  # Autenticación de sesiones para el Back-office
-  get  "login",  to: "sessions#new",     as: :login
-  post "login",  to: "sessions#create"
-  delete "logout", to: "sessions#destroy", as: :logout
+  get "up" => "rails/health#show", as: :rails_health_check
 
-  # Espacio de nombres para el Back-Office
+  root to: redirect("/login")
+  get "/login", to: "sessions#new"
+  post "/login", to: "sessions#create"
+  delete "/logout", to: "sessions#destroy"
+
   namespace :admin do
     root to: "sports_complexes#index"
     resources :sports_complexes
     resources :courts
-    resources :reservations, only: [:index, :show, :update]
+    resources :reservations, only: [:index, :show]
   end
 
-  # Redirección de la raíz del sitio al login o panel
-  root to: redirect("/login")
+  namespace :api, defaults: { format: :json } do
+    namespace :v1 do
+      resources :sports_complexes, only: [:index, :show]
+      resources :courts, only: [:index, :show]
+      resources :reservations, only: [:index, :show, :create]
+    end
+  end
 end
