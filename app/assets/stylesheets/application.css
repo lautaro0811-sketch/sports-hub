@@ -19,6 +19,10 @@
   --bg-card: #ffffff;
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --neutral-bg: #f1f5f9;
+  --neutral-text: var(--text-muted);
+  --warning-color: #92400e;
+  --warning-bg: #fef3c7;
 }
 
 /* ==========================================================================
@@ -364,4 +368,41 @@ body {
   text-align: center;
   color: var(--text-muted);
   padding: 32px 16px;
+}
+
+/* Selectores de formulario */
+select.form-input {
+  cursor: pointer;
+  background-color: var(--bg-card);
+}
+
+/* Badges / Etiquetas de estado */
+.badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.badge-success {
+  background-color: var(--success-bg);
+  color: var(--success-text);
+}
+
+.badge-secondary {
+  background-color: var(--neutral-bg);
+  color: var(--neutral-text);
+}
+
+/* Badges de estado para reservas */
+.badge-warning {
+  background-color: var(--warning-bg); 
+  color: var(--warning-color);
+}
+
+.badge-danger {
+  background-color: var(--danger-bg);
+  color: var(--danger-text);
 }
