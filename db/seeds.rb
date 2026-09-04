@@ -67,7 +67,7 @@ end
 puts "Creando franjas horarias (TimeSlots)..."
 # Generamos franjas para días de semana (Lunes a Viernes: días 1 a 5)
 # Por ejemplo: turnos de 18:00 a 19:00 y de 19:00 a 20:00
-[cancha_f5_central, cancha_padel_central, cancha_tenis_norte].each do |cancha|
+[ cancha_f5_central, cancha_padel_central, cancha_tenis_norte ].each do |cancha|
   (1..5).each do |dia|
     TimeSlot.find_or_create_by!(court: cancha, day_of_week: dia, start_time: "18:00", end_time: "19:00") do |slot|
       slot.price = 15000.0

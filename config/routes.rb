@@ -10,14 +10,14 @@ Rails.application.routes.draw do
     root to: "sports_complexes#index"
     resources :sports_complexes
     resources :courts
-    resources :reservations, only: [:index, :show]
+    resources :reservations, only: [ :index, :show ]
   end
 
   namespace :api, defaults: { format: :json } do
     namespace :v1 do
-      resources :sports_complexes, only: [:index, :show]
-      resources :courts, only: [:index, :show]
-      resources :reservations, only: [:index, :show, :create]
+      resources :sports_complexes, only: [ :index, :show ]
+      resources :courts, only: [ :index, :show ]
+      resources :reservations, only: [ :index, :show, :create ]
     end
   end
 end

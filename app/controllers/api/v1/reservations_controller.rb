@@ -1,10 +1,10 @@
 module Api
   module V1
     class ReservationsController < BaseController
-      before_action :set_court, only: [:create]
+      before_action :set_court, only: [ :create ]
 
       def index
-        @reservations = Reservation.includes(:user, court: [:sports_complex, :sport])
+        @reservations = Reservation.includes(:user, court: [ :sports_complex, :sport ])
                                    .order(reservation_date: :desc, start_time: :desc)
         if params[:user_id].present?
           @reservations = @reservations.where(user_id: params[:user_id])
@@ -14,14 +14,14 @@ module Api
       end
 
       def show
-        @reservation = Reservation.includes(:user, court: [:sports_complex, :sport]).find(params[:id])
+        @reservation = Reservation.includes(:user, court: [ :sports_complex, :sport ]).find(params[:id])
 
         render json: serialize_reservation(@reservation, detailed: true)
       end
 
       def create
         @reservation = Reservation.new(reservation_params)
-        
+
         # Asignar usuario si se envía o tomar el primero disponible para testing si no se especificó
         @reservation.user_id ||= params[:user_id] || User.first&.id
 

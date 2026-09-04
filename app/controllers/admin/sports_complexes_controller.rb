@@ -1,6 +1,6 @@
 module Admin
   class SportsComplexesController < BaseController
-    before_action :set_sports_complex, only: [:edit, :update, :destroy]
+    before_action :set_sports_complex, only: [ :edit, :update, :destroy ]
 
     def index
       @sports_complexes = SportsComplex.all
