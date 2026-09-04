@@ -1,0 +1,48 @@
+<div class="page-header">
+  <h1 class="page-title">Canchas</h1>
+  <%= link_to "Nueva Cancha", new_admin_court_path, class: "btn btn-primary" %>
+</div>
+
+<table class="admin-table">
+  <thead>
+    <tr>
+      <th>Nombre</th>
+      <th>Complejo</th>
+      <th>Deporte</th>
+      <th>Superficie</th>
+      <th>Estado</th>
+      <th class="text-right">Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% if @courts.any? %>
+      <% @courts.each do |court| %>
+        <tr>
+          <td><strong><%= court.name %></strong></td>
+          <td><%= court.sports_complex.name %></td>
+          <td><%= court.sport.name %></td>
+          <td><%= court.surface_type %></td>
+          <td>
+            <% if court.is_active? %>
+              <span class="badge badge-success">Activa</span>
+            <% else %>
+              <span class="badge badge-secondary">Inactiva</span>
+            <% end %>
+          </td>
+          <td>
+            <div class="table-actions">
+              <%= link_to "Editar", edit_admin_court_path(court), class: "btn btn-sm btn-secondary" %>
+              <%= button_to "Eliminar", admin_court_path(court), method: :delete, data: { turbo_confirm: "¿Seguro que querés eliminar la cancha #{court.name}?" }, class: "btn btn-sm btn-danger" %>
+            </div>
+          </td>
+        </tr>
+      <% end %>
+    <% else %>
+      <tr>
+        <td colspan="6" class="table-empty">
+          No hay canchas registradas todavía.
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

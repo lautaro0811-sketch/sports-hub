@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>SportsHub - Admin</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+  <body>
+    <header class="admin-navbar">
+      <div class="admin-nav-links">
+        <%= link_to "SportsHub Admin", admin_root_path, class: "admin-nav-brand" %>
+        <%= link_to "Complejos", admin_sports_complexes_path, class: "admin-nav-link #{'active' if controller_name == 'sports_complexes'}" %>
+        <%= link_to "Canchas", admin_courts_path, class: "admin-nav-link #{'active' if controller_name == 'courts'}" %>
+        <%= link_to "Reservas", admin_reservations_path, class: "admin-nav-link #{'active' if controller_name == 'reservations'}" %>
+      </div>
+      <div class="admin-nav-user">
+        <span>Hola, <strong><%= current_user.name %></strong></span>
+        <%= button_to "Cerrar sesión", logout_path, method: :delete, class: "btn-outline-danger" %>
+      </div>
+    </header>
+
+    <main class="admin-container">
+      <% if flash[:notice] %>
+        <div class="alert alert-success">
+          <%= flash[:notice] %>
+        </div>
+      <% end %>
+
+      <% if flash[:alert] %>
+        <div class="alert alert-danger">
+          <%= flash[:alert] %>
+        </div>
+      <% end %>
+
+      <%= yield %>
+    </main>
+  </body>
+</html>

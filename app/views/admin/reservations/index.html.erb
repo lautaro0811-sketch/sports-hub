@@ -1,0 +1,56 @@
+<div class="page-header">
+  <h1 class="page-title">Reservas</h1>
+</div>
+
+<table class="admin-table">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Fecha</th>
+      <th>Horario</th>
+      <th>Cliente</th>
+      <th>Complejo</th>
+      <th>Cancha</th>
+      <th>Total</th>
+      <th>Estado</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% if @reservations.any? %>
+      <% @reservations.each do |reservation| %>
+        <tr>
+          <td>#<%= reservation.id %></td>
+          <td><%= reservation.reservation_date.strftime("%d/%m/%Y") %></td>
+          <td>
+            <%= reservation.start_time.strftime("%H:%M") %> - <%= reservation.end_time.strftime("%H:%M") %> hs
+          </td>
+          <td>
+            <strong><%= reservation.user.name %></strong>
+            <span class="table-subtext"><%= reservation.user.email %></span>
+          </td>
+          <td><%= reservation.court.sports_complex.name %></td>
+          <td><%= reservation.court.name %> (<%= reservation.court.sport.name %>)</td>
+          <td>$<%= number_with_precision(reservation.total_price, precision: 2, delimiter: ".") %></td>
+          <td>
+            <% case reservation.status %>
+            <% when "confirmed", 1 %>
+              <span class="badge badge-success">Confirmada</span>
+            <% when "pending", 0 %>
+              <span class="badge badge-warning">Pendiente</span>
+            <% when "cancelled", 2 %>
+              <span class="badge badge-danger">Cancelada</span>
+            <% else %>
+              <span class="badge badge-secondary"><%= reservation.status %></span>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    <% else %>
+      <tr>
+        <td colspan="8" class="table-empty">
+          No hay reservas registradas en el sistema.
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

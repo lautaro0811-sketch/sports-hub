@@ -1,14 +1,17 @@
 Rails.application.routes.draw do
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
+  # Autenticación de sesiones para el Back-office
+  get  "login",  to: "sessions#new",     as: :login
+  post "login",  to: "sessions#create"
+  delete "logout", to: "sessions#destroy", as: :logout
 
-  # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
-  # Can be used by load balancers and uptime monitors to verify that the app is live.
-  get "up" => "rails/health#show", as: :rails_health_check
+  # Espacio de nombres para el Back-Office
+  namespace :admin do
+    root to: "sports_complexes#index"
+    resources :sports_complexes
+    resources :courts
+    resources :reservations, only: [:index, :show, :update]
+  end
 
-  # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
-  # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
-  # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
-
-  # Defines the root path route ("/")
-  # root "posts#index"
+  # Redirección de la raíz del sitio al login o panel
+  root to: redirect("/login")
 end
