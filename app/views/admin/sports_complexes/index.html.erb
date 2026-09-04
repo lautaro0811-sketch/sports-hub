@@ -1,0 +1,52 @@
+<div class="page-header">
+  <h1 class="page-title">Complejos Deportivos</h1>
+  <%= link_to "Nuevo Complejo", new_admin_sports_complex_path, class: "btn btn-primary" %>
+</div>
+
+<table class="admin-table">
+  <thead>
+    <tr>
+      <th class="table-thumbnail-col">Foto</th>
+      <th>Nombre</th>
+      <th>Dirección</th>
+      <th>Ciudad</th>
+      <th>Teléfono</th>
+      <th>Canchas</th>
+      <th class="text-right">Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% if @sports_complexes.any? %>
+      <% @sports_complexes.each do |complex| %>
+        <tr>
+          <td class="table-thumbnail-col">
+            <% if complex.cover_photo.attached? %>
+              <%= image_tag complex.cover_photo, class: "table-thumbnail", alt: complex.name %>
+            <% else %>
+              <div class="table-thumbnail-placeholder">
+                Sin foto
+              </div>
+            <% end %>
+          </td>
+          <td><strong><%= complex.name %></strong></td>
+          <td><%= complex.address %></td>
+          <td><%= complex.city %></td>
+          <td><%= complex.phone %></td>
+          <td><%= complex.courts.count %></td>
+          <td>
+            <div class="table-actions">
+              <%= link_to "Editar", edit_admin_sports_complex_path(complex), class: "btn btn-sm btn-secondary" %>
+              <%= button_to "Eliminar", admin_sports_complex_path(complex), method: :delete, data: { turbo_confirm: "¿Seguro que querés eliminar este complejo?" }, class: "btn btn-sm btn-danger" %>
+            </div>
+          </td>
+        </tr>
+      <% end %>
+    <% else %>
+      <tr>
+        <td colspan="7" class="table-empty">
+          No hay complejos registrados todavía.
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
