@@ -1,21 +1,17 @@
 module Admin
   class BaseController < ApplicationController
-    before_action :authenticate_admin!
+    before_action :require_admin!
 
     layout "admin"
 
     private
 
-    def authenticate_admin!
-      unless current_user&.admin?
-        flash[:alert] = "Acceso no autorizado. Debe iniciar sesión como administrador."
-        redirect_to login_path
+    def require_admin!
+      if current_user.nil?
+        redirect_to login_path, alert: "Debes iniciar sesión para acceder al panel."
+      elsif current_admin_user.nil?
+        redirect_to login_path, alert: "Acceso denegado: se requieren permisos de administrador."
       end
     end
-
-    def current_user
-      @current_user ||= User.find_by(id: session[:user_id]) if session[:user_id]
-    end
-    helper_method :current_user
   end
 end

@@ -1,6 +1,6 @@
 class SessionsController < ApplicationController
   def new
-    redirect_to admin_root_path if current_user&.admin?
+    redirect_to admin_root_path if current_admin_user
   end
 
   def create
@@ -12,26 +12,27 @@ class SessionsController < ApplicationController
 
     user = User.find_by("LOWER(email) = ?", email)
 
-    if user&.authenticate(password) && user.admin?
+    if user&.authenticate(password)
       session[:user_id] = user.id
-      flash[:notice] = "Bienvenido al panel de administración, #{user.name}."
-      redirect_to admin_root_path
+      handle_post_login_redirect(user)
     else
-      flash.now[:alert] = "Credenciales inválidas o no posee permisos de administrador."
+      flash.now[:alert] = "Credenciales inválidas"
       render :new, status: :unprocessable_entity
     end
   end
 
   def destroy
     session[:user_id] = nil
-    flash[:notice] = "Sesión cerrada correctamente."
-    redirect_to login_path
+    redirect_to login_path, notice: "Sesión cerrada correctamente."
   end
 
   private
 
-  def current_user
-    @current_user ||= User.find_by(id: session[:user_id]) if session[:user_id]
+  def handle_post_login_redirect(user)
+    if user.admin?
+      redirect_to admin_root_path, notice: "Bienvenido al panel de administración, #{user.name}."
+    else
+      redirect_to login_path, notice: "Sesión iniciada correctamente, #{user.name}."
+    end
   end
-  helper_method :current_user
 end
