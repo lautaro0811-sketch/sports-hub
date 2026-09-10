@@ -1,7 +1,7 @@
 module Admin
     class CourtsController < BaseController
-        before_action :set_court, only: [:edit, :update, :destroy]
-        
+        before_action :set_court, only: [ :edit, :update, :destroy ]
+
     def index
       @courts = Court.includes(:sports_complex, :sport).all
     end
@@ -43,5 +43,5 @@ module Admin
     def court_params
       params.require(:court).permit(:name, :sports_complex_id, :sport_id, :surface_type, :is_active)
     end
-  end
+    end
 end
