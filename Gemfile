@@ -64,3 +64,6 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
 end
+
+# Autenticación basada en JSON Web Tokens para la API
+gem "jwt"
