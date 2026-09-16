@@ -11,20 +11,20 @@ Rails.application.routes.draw do
     root to: "sports_complexes#index"
     resources :sports_complexes
     resources :courts do
-      resources :time_slots, only: [ :index, :create, :destroy ]
+      resources :time_slots, only: %i[index create destroy]
     end
-    resources :reservations, only: [ :index, :show, :update ]
+    resources :reservations, only: %i[index show update]
   end
 
   namespace :api, defaults: { format: :json } do
     namespace :v1 do
       post "auth/login", to: "authentication#login"
 
-      resources :sports_complexes, only: [ :index, :show ] do
-        resources :courts, only: [ :index, :show ]
+      resources :sports_complexes, only: %i[index show] do
+        resources :courts, only: %i[index show]
       end
 
-      resources :reservations, only: [ :index, :show, :create ]
+      resources :reservations, only: %i[index show create]
     end
   end
 end
