@@ -18,9 +18,12 @@ Rails.application.routes.draw do
 
   namespace :api, defaults: { format: :json } do
     namespace :v1 do
-        post "auth/login", to: "authentication#login"
-      resources :sports_complexes, only: [ :index, :show ]
-      resources :courts, only: [ :index, :show ]
+      post "auth/login", to: "authentication#login"
+
+      resources :sports_complexes, only: [ :index, :show ] do
+        resources :courts, only: [ :index, :show ]
+      end
+
       resources :reservations, only: [ :index, :show, :create ]
     end
   end
