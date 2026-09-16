@@ -1,0 +1,12 @@
+<h1>¡Hola <%= @user.name %>!</h1>
+<p>Tu reserva ha sido confirmada con éxito. Aquí están los detalles:</p>
+
+<ul>
+  <li><strong>Complejo:</strong> <%= @complex.name %> (<%= @complex.address %>)</li>
+  <li><strong>Cancha:</strong> <%= @court.name %> (<%= @court.surface_type %>)</li>
+  <li><strong>Fecha:</strong> <%= @reservation.reservation_date.strftime("%d/%m/%Y") %></li>
+  <li><strong>Horario:</strong> <%= @reservation.start_time.strftime("%H:%M") %> a <%= @reservation.end_time.strftime("%H:%M") %> hs</li>
+  <li><strong>Precio Total:</strong> $<%= @reservation.total_price %></li>
+</ul>
+
+<p>¡Gracias por elegir Sports Hub!</p>
