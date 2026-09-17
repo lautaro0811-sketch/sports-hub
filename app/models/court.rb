@@ -10,7 +10,60 @@ class Court < ApplicationRecord
   validates :base_price, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
 
   scope :active, -> { where(is_active: true) }
-  scope :by_sport, ->(sport_id) { where(sport_id: sport_id) if sport_id.present? }
+
+  # Filtro por deporte: acepta ID numérico o nombre del deporte (case-insensitive)
+  scope :by_sport, ->(sport_param) {
+    return all if sport_param.blank?
+
+    if sport_param.to_s.match?(/\A\d+\z/)
+      where(sport_id: sport_param)
+    else
+      joins(:sport).where("LOWER(sports.name) = LOWER(?)", sport_param.to_s.strip)
+    end
+  }
+
+  # Filtro por franja horaria configurada para el día de la semana y rango horario
+  scope :with_time_slot_at, ->(day_of_week, time_str) {
+    where(
+      "EXISTS (
+        SELECT 1 FROM time_slots 
+        WHERE time_slots.court_id = courts.id 
+          AND time_slots.day_of_week = :wday 
+          AND time_slots.start_time <= :time 
+          AND time_slots.end_time > :time
+      )",
+      wday: day_of_week,
+      time: time_str
+    )
+  }
+
+  # Filtro para excluir canchas con reservas activas (no canceladas) en la fecha y hora
+  scope :without_reservation_at, ->(date, time_str) {
+    where(
+      "NOT EXISTS (
+        SELECT 1 FROM reservations 
+        WHERE reservations.court_id = courts.id 
+          AND reservations.reservation_date = :date 
+          AND reservations.status != :cancelled_status 
+          AND reservations.start_time <= :time 
+          AND reservations.end_time > :time
+      )",
+      date: date,
+      cancelled_status: Reservation.statuses[:cancelled],
+      time: time_str
+    )
+  }
+
+  # Scope integrador de disponibilidad
+  scope :available_at, ->(date, time) {
+    return all if date.blank? || time.blank?
+
+    target_date = date.is_a?(Date) ? date : Date.parse(date.to_s)
+    target_time = time.respond_to?(:strftime) ? time.strftime("%H:%M:%S") : Time.zone.parse(time.to_s)&.strftime("%H:%M:%S") || time
+
+    with_time_slot_at(target_date.wday, target_time)
+      .without_reservation_at(target_date, target_time)
+  }
 
   def effective_pricing_scheme
     pricing_scheme || sports_complex&.default_pricing_scheme

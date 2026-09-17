@@ -36,7 +36,7 @@
           <td><%= complex.courts.count %></td>
           <td>
             <% if complex.default_pricing_scheme.present? %>
-              <%= link_to complex.default_pricing_scheme.name, admin_pricing_scheme_path(complex.default_pricing_scheme), class: "badge badge-success", style: "text-decoration: none;" %>
+              <%= link_to complex.default_pricing_scheme.name, admin_pricing_scheme_path(complex.default_pricing_scheme), class: "badge badge-success" %>
             <% else %>
               <span class="table-subtext">Sin esquema (Base 1.0)</span>
             <% end %>

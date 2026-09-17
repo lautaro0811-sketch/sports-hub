@@ -153,4 +153,97 @@ class ReservationTest < ActiveSupport::TestCase
     assert_not reservation.valid?
     assert_includes reservation.errors[:reservation_date], "no puede ser en el pasado"
   end
+
+  test "permite cancelar una reserva con más de 24 horas de anticipación" do
+    target_date = 3.days.from_now.to_date
+    reservation = Reservation.create!(
+      user: @user,
+      court: @court,
+      reservation_date: target_date,
+      start_time: Time.zone.parse("#{target_date} 18:00"),
+      end_time: Time.zone.parse("#{target_date} 19:00"),
+      status: :confirmed
+    )
+
+    assert reservation.can_be_cancelled?
+    assert reservation.cancel!
+    assert reservation.cancelled?
+  end
+
+  test "no permite cancelar una reserva con menos de 24 horas de anticipación" do
+    # Horario dentro de las próximas 12 horas
+    soon_time = 12.hours.from_now
+    reservation = Reservation.create!(
+      user: @user,
+      court: @court,
+      reservation_date: soon_time.to_date,
+      start_time: soon_time,
+      end_time: soon_time + 1.hour,
+      status: :confirmed
+    )
+
+    assert_not reservation.can_be_cancelled?
+    assert_not reservation.cancel!
+    assert_includes reservation.errors[:base], "No es posible cancelar la reserva: debe realizarse con al menos 24 horas de anticipación."
+    assert_not reservation.cancelled?
+  end
+
+  test "no permite cancelar una reserva ya cancelada" do
+    target_date = 3.days.from_now.to_date
+    reservation = Reservation.create!(
+      user: @user,
+      court: @court,
+      reservation_date: target_date,
+      start_time: Time.zone.parse("#{target_date} 18:00"),
+      end_time: Time.zone.parse("#{target_date} 19:00"),
+      status: :cancelled
+    )
+
+    assert_not reservation.cancel!
+    assert_includes reservation.errors[:base], "La reserva ya se encuentra cancelada."
+  end
+
+  test "scopes de filtrado y ordenamiento funcionan correctamente" do
+    other_complex = SportsComplex.new(name: "Otro Complejo", address: "Av 7", city: "La Plata")
+    other_complex.save(validate: false)
+
+    other_court = Court.new(
+      name: "Cancha Otro",
+      sport: @sport,
+      sports_complex: other_complex,
+      base_price: 30000.0
+    )
+    other_court.save(validate: false)
+
+    res1 = Reservation.create!(
+      user: @user,
+      court: @court,
+      reservation_date: 2.days.from_now.to_date,
+      start_time: Time.zone.parse("#{2.days.from_now.to_date} 10:00"),
+      end_time: Time.zone.parse("#{2.days.from_now.to_date} 11:00"),
+      status: :pending
+    )
+
+    res2 = Reservation.create!(
+      user: @user,
+      court: other_court,
+      reservation_date: 4.days.from_now.to_date,
+      start_time: Time.zone.parse("#{4.days.from_now.to_date} 15:00"),
+      end_time: Time.zone.parse("#{4.days.from_now.to_date} 16:00"),
+      status: :confirmed
+    )
+
+    # Filtrado por complejo
+    assert_includes Reservation.by_sports_complex(@complex.id), res1
+    assert_not_includes Reservation.by_sports_complex(@complex.id), res2
+
+    # Filtrado por estado
+    assert_includes Reservation.by_status(:pending), res1
+    assert_not_includes Reservation.by_status(:pending), res2
+    assert_includes Reservation.by_status("confirmed"), res2
+
+    # Ordenamiento
+    assert_equal [res2, res1], Reservation.ordered_by_date(:desc).to_a
+    assert_equal [res1, res2], Reservation.ordered_by_date(:asc).to_a
+  end
 end

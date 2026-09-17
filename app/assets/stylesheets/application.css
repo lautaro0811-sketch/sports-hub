@@ -5,13 +5,14 @@
   /* Marca e interacciones primarias */
   --primary-color: #2563eb;
   --primary-hover: #1d4ed8;
+  --primary-bg: #eff6ff;
   --primary-focus-ring: rgba(37, 99, 235, 0.15);
 
   /* Colores secundarios y neutros */
   --secondary-color: #64748b;
   --secondary-hover: #475569;
   --neutral-bg: #f1f5f9;
-  --neutral-text: var(--text-muted);
+  --placeholder-bg: #e2e8f0;
 
   /* Estados: Peligro / Errores */
   --danger-color: #dc2626;
@@ -19,8 +20,6 @@
   --danger-bg: #fee2e2;
   --danger-border: #fecaca;
   --danger-text: #991b1b;
-  --danger-outline: #f87171;
-  --danger-outline-hover: #ef4444;
 
   /* Estados: Éxito */
   --success-bg: #dcfce7;
@@ -29,16 +28,7 @@
 
   /* Estados: Advertencia / Pendiente */
   --warning-bg: #fef3c7;
-  --warning-color: #92400e;
-
-  /* Bordes, sombras y radios */
-  --border-color: #cbd5e1;
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
-  --radius-pill: 9999px;
+  --warning-text: #92400e;
 
   /* Fondos y textos base */
   --text-main: #0f172a;
@@ -48,12 +38,17 @@
   --bg-card: #ffffff;
 
   /* Navbar y estructura del Admin */
-  --admin-nav-bg: #0f172a;
   --admin-nav-link: #94a3b8;
-  --admin-nav-link-hover: #ffffff;
   --admin-nav-active-bg: rgba(255, 255, 255, 0.1);
-  --table-header-bg: #f1f5f9;
-  --placeholder-bg: #e2e8f0;
+
+  /* Bordes, sombras y radios */
+  --border-color: #cbd5e1;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-pill: 9999px;
 }
 
 /* ==========================================================================
@@ -220,8 +215,8 @@ select.form-input {
 
 .btn-outline-danger {
   background: transparent;
-  color: var(--danger-outline);
-  border: 1px solid var(--danger-outline);
+  color: var(--danger-color);
+  border: 1px solid var(--danger-color);
   padding: 6px 12px;
   border-radius: var(--radius-sm);
   cursor: pointer;
@@ -231,7 +226,7 @@ select.form-input {
 }
 
 .btn-outline-danger:hover {
-  background-color: var(--danger-outline-hover);
+  background-color: var(--danger-color);
   color: var(--text-inverse);
 }
 
@@ -268,7 +263,7 @@ select.form-input {
    7. ESTRUCTURA DEL BACK-OFFICE (/admin)
    ========================================================================== */
 .admin-navbar {
-  background-color: var(--admin-nav-bg);
+  background-color: var(--text-main);
   color: var(--text-inverse);
   padding: 14px 24px;
   display: flex;
@@ -301,11 +296,11 @@ select.form-input {
 }
 
 .admin-nav-link:hover {
-  color: var(--admin-nav-link-hover);
+  color: var(--text-inverse);
 }
 
 .admin-nav-link.active {
-  color: var(--admin-nav-link-hover);
+  color: var(--text-inverse);
   background-color: var(--admin-nav-active-bg);
   font-weight: 600;
 }
@@ -366,7 +361,7 @@ select.form-input {
 }
 
 .admin-table th {
-  background-color: var(--table-header-bg);
+  background-color: var(--neutral-bg);
   font-weight: 600;
   color: var(--text-muted);
 }
@@ -420,7 +415,7 @@ select.form-input {
 .table-subtext {
   display: block;
   font-size: 12px;
-  color: var(--neutral-text);
+  color: var(--text-muted);
   margin-top: 2px;
 }
 
@@ -432,6 +427,12 @@ select.form-input {
   font-size: 12px;
   font-weight: 600;
   text-align: center;
+  text-decoration: none;
+}
+
+.badge-primary {
+  background-color: var(--primary-color);
+  color: var(--text-inverse);
 }
 
 .badge-success {
@@ -441,15 +442,554 @@ select.form-input {
 
 .badge-secondary {
   background-color: var(--neutral-bg);
-  color: var(--neutral-text);
+  color: var(--text-muted);
 }
 
 .badge-warning {
   background-color: var(--warning-bg);
-  color: var(--warning-color);
+  color: var(--warning-text);
 }
 
 .badge-danger {
   background-color: var(--danger-bg);
   color: var(--danger-text);
+}
+
+.badge-sm {
+  font-size: 11px;
+}
+
+.badge-xs {
+  font-size: 10px;
+  padding: 2px 6px;
+}
+
+.badge-price {
+  color: var(--success-text);
+  font-weight: 600;
+}
+
+.btn-xs {
+  padding: 3px 8px;
+  font-size: 12px;
+}
+
+.btn-icon-delete {
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 18px;
+  line-height: 1;
+  padding: 2px 6px;
+  border: none;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: color 0.15s ease;
+}
+
+.btn-icon-delete:hover {
+  color: var(--danger-color);
+}
+
+.btn-group-wrap {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+/* ==========================================================================
+   9. TARJETAS DE CONTENIDO Y SECCIONES
+   ========================================================================== */
+.page-subtitle {
+  margin: 4px 0 0 0;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.content-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  margin-bottom: 30px;
+  box-shadow: var(--shadow-sm);
+}
+
+.card-section-title {
+  margin-top: 0;
+  margin-bottom: 8px;
+  font-size: 1.25rem;
+  color: var(--text-main);
+}
+
+.card-section-desc {
+  margin-top: 0;
+  margin-bottom: 16px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.section-container {
+  margin-bottom: 35px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.section-heading {
+  margin: 0;
+  font-size: 1.25rem;
+  color: var(--text-main);
+}
+
+.section-counter {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* ==========================================================================
+   10. FILTROS Y FORMULARIOS AVANZADOS
+   ========================================================================== */
+.filter-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-sm);
+}
+
+.filter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) auto;
+  gap: 16px;
+  align-items: flex-end;
+}
+
+.filter-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.form-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.checkbox-group-container {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  background-color: var(--bg-page);
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+}
+
+.checkbox-inline-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.form-grid-pricing {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  align-items: flex-end;
+  margin-bottom: 20px;
+}
+
+.form-grid-slots {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  align-items: flex-end;
+}
+
+/* ==========================================================================
+   11. BANNER INFORMATIVO
+   ========================================================================== */
+.banner-info {
+  background-color: var(--bg-page);
+  border: 1px solid var(--border-color);
+  border-left: 4px solid var(--primary-color);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  margin-bottom: 22px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.banner-info-icon {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.banner-info-content {
+  font-size: 13.5px;
+  color: var(--text-main);
+  line-height: 1.4;
+}
+
+/* ==========================================================================
+   12. ESQUEMAS TARIFARIOS Y REGLAS (DÍAS)
+   ========================================================================== */
+.day-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.day-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.day-card-header {
+  background-color: var(--neutral-bg);
+  padding: 10px 16px;
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.day-card-body {
+  padding: 12px 16px;
+}
+
+.rule-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rule-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background-color: var(--bg-page);
+  border: 1px solid var(--placeholder-bg);
+  border-radius: var(--radius-md);
+}
+
+.rule-time {
+  font-size: 14px;
+}
+
+.rule-multiplier-row {
+  margin-top: 2px;
+}
+
+.rule-calc-note {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-left: 4px;
+}
+
+.day-card-empty {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-style: italic;
+  padding: 8px 0;
+}
+
+/* ==========================================================================
+   13. ASIGNACIÓN DE CANCHAS
+   ========================================================================== */
+.court-assignment-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.court-assign-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--placeholder-bg);
+  background-color: var(--bg-card);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.court-assign-card.court-assign-card-selected {
+  border-color: var(--primary-color);
+  background-color: var(--primary-bg);
+}
+
+.court-assign-checkbox {
+  margin-top: 3px;
+}
+
+.court-assign-info {
+  flex: 1;
+}
+
+.court-assign-name {
+  font-size: 14px;
+  display: block;
+}
+
+.court-assign-meta {
+  font-size: 12px;
+  color: var(--text-muted);
+  display: block;
+}
+
+.court-assign-price {
+  font-size: 12px;
+  color: var(--success-text);
+  font-weight: 500;
+  display: block;
+}
+
+/* ==========================================================================
+   14. DISPONIBILIDAD Y TURNOS (TIME SLOTS)
+   ========================================================================== */
+.header-badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+
+.header-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.day-selection-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pill-group-container {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  background-color: var(--bg-page);
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+}
+
+.day-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-card);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.day-pill.day-pill-active {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  color: var(--text-inverse);
+  font-weight: 600;
+}
+
+.day-pill.day-pill-active span {
+  color: var(--text-inverse);
+}
+
+.view-controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.view-toggle-group {
+  display: inline-flex;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background-color: var(--bg-card);
+}
+
+.view-toggle-btn {
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: 0;
+  border: none;
+  font-weight: normal;
+  padding: 6px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.view-toggle-btn.active {
+  background-color: var(--neutral-bg);
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.slot-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.slot-day-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+}
+
+.slot-day-header {
+  background-color: var(--bg-page);
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.slot-day-header.has-slots {
+  background-color: var(--neutral-bg);
+}
+
+.slot-day-title {
+  font-size: 15px;
+  color: var(--text-main);
+}
+
+.slot-list {
+  padding: 12px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.slot-item {
+  background-color: var(--bg-page);
+  border: 1px solid var(--placeholder-bg);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background-color 0.15s ease;
+}
+
+.slot-time {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text-main);
+  letter-spacing: -0.2px;
+}
+
+.slot-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 3px;
+  font-size: 12px;
+}
+
+.slot-day-empty {
+  padding: 24px 12px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-style: italic;
+}
+
+.slot-closed-note {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.slot-table-wrapper {
+  background-color: var(--bg-card);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+/* ==========================================================================
+   15. UTILIDADES GENERALES
+   ========================================================================== */
+.price-highlight {
+  color: var(--success-text);
+}
+
+.text-muted {
+  color: var(--text-muted);
+}
+
+.text-separator {
+  color: var(--border-color);
+}
+
+.text-muted-italic {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.font-bold {
+  font-weight: 600;
+}
+
+.mb-0 {
+  margin-bottom: 0 !important;
+}
+
+.mb-md {
+  margin-bottom: 16px !important;
+}
+
+.mt-0 {
+  margin-top: 0 !important;
+}
+
+.mt-1 {
+  margin-top: 4px !important;
+}
+
+.is-hidden {
+  display: none !important;
 }

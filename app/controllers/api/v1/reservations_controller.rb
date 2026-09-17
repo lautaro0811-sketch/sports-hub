@@ -43,6 +43,23 @@ module Api
         end
       end
 
+      def destroy
+        @reservation = current_user.reservations.find(params[:id])
+
+        if @reservation.cancel!
+          ReservationMailer.cancellation_email(@reservation).deliver_later
+
+          render json: {
+            message: "Reserva cancelada exitosamente",
+            reservation: @reservation
+          }, status: :ok
+        else
+          render json: { errors: @reservation.errors.full_messages }, status: :unprocessable_entity
+        end
+      rescue ActiveRecord::RecordNotFound
+        render json: { error: "Reserva no encontrada o no autorizada" }, status: :not_found
+      end
+
       private
 
       def reservation_params
