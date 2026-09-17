@@ -50,7 +50,7 @@ class Admin::PricingSchemesTest < ActionDispatch::IntegrationTest
     # 3. Agregar reglas masivas para Lunes a Viernes
     post admin_pricing_scheme_pricing_rules_path(scheme), params: {
       pricing_rule: {
-        days_of_week: [1, 2, 3, 4, 5],
+        days_of_week: [ 1, 2, 3, 4, 5 ],
         start_time: "18:00",
         end_time: "23:00",
         multiplier: 1.5
@@ -63,7 +63,7 @@ class Admin::PricingSchemesTest < ActionDispatch::IntegrationTest
 
     # 4. Asignar el esquema a la cancha
     post assign_courts_admin_pricing_scheme_path(scheme), params: {
-      court_ids: [@court.id]
+      court_ids: [ @court.id ]
     }
     assert_redirected_to admin_pricing_scheme_path(scheme)
     @court.reload
@@ -98,4 +98,3 @@ class Admin::PricingSchemesTest < ActionDispatch::IntegrationTest
     assert_nil @court.pricing_scheme_id
   end
 end
-

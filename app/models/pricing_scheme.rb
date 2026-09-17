@@ -6,7 +6,7 @@ class PricingScheme < ApplicationRecord
   validates :name, presence: true, uniqueness: true
 
   # Orden natural de la semana en el panel (Lunes a Domingo)
-  DAY_ORDER = [1, 2, 3, 4, 5, 6, 0].freeze
+  DAY_ORDER = [ 1, 2, 3, 4, 5, 6, 0 ].freeze
 
   def rule_for(date, start_time, end_time = nil)
     return nil if date.blank? || start_time.blank?
@@ -31,7 +31,7 @@ class PricingScheme < ApplicationRecord
   def add_rules(days_of_week:, start_time:, end_time:, multiplier:)
     days = Array(days_of_week).map(&:to_i).uniq
     if days.empty?
-      return { success: false, errors: ["Debe seleccionar al menos un día de la semana."] }
+      return { success: false, errors: [ "Debe seleccionar al menos un día de la semana." ] }
     end
 
     created_rules = []
@@ -72,4 +72,3 @@ class PricingScheme < ApplicationRecord
     (direct_ids + inherited_ids).uniq.size
   end
 end
-

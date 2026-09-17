@@ -57,4 +57,3 @@ class Admin::SportsComplexesTest < ActionDispatch::IntegrationTest
     assert_equal @scheme.id, complex.default_pricing_scheme_id
   end
 end
-

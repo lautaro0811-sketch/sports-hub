@@ -42,7 +42,7 @@ class Admin::TimeSlotsTest < ActionDispatch::IntegrationTest
 
     # Títulos y textos aclaratorios
     assert_select "h1", text: /Disponibilidad Semanal y Turnos: Cancha Cristal 1/
-    assert_select "strong", text: "¿Para qué sirve esta pantalla?"
+    assert_select "strong", text: "Configurá la disponibilidad de esta cancha:"
     assert_select "h2", text: "Habilitar Turnos de Reserva"
     assert_select "h2", text: "Cronograma Semanal de Disponibilidad"
   end
@@ -51,7 +51,7 @@ class Admin::TimeSlotsTest < ActionDispatch::IntegrationTest
     # De 18:00 a 21:00 en bloques de 60 min para Lunes (1) y Martes (2) = 3 turnos x 2 días = 6 turnos
     assert_difference -> { @court.time_slots.count }, 6 do
       post admin_court_time_slots_path(@court), params: {
-        days_of_week: ["1", "2"],
+        days_of_week: [ "1", "2" ],
         start_time: "18:00",
         end_time: "21:00",
         slot_duration: "60"
@@ -82,7 +82,7 @@ class Admin::TimeSlotsTest < ActionDispatch::IntegrationTest
     # De 18:00 a 21:00 en bloques de 90 min = 2 turnos (18:00-19:30, 19:30-21:00) para Miércoles (3)
     assert_difference -> { @court.time_slots.count }, 2 do
       post admin_court_time_slots_path(@court), params: {
-        days_of_week: ["3"],
+        days_of_week: [ "3" ],
         start_time: "18:00",
         end_time: "21:00",
         slot_duration: "90"
@@ -100,7 +100,7 @@ class Admin::TimeSlotsTest < ActionDispatch::IntegrationTest
   test "crea turno único con franja completa sin dividir" do
     assert_difference -> { @court.time_slots.count }, 1 do
       post admin_court_time_slots_path(@court), params: {
-        days_of_week: ["5"], # Viernes
+        days_of_week: [ "5" ], # Viernes
         start_time: "21:00",
         end_time: "23:00",
         slot_duration: "exact"
@@ -163,4 +163,3 @@ class Admin::TimeSlotsTest < ActionDispatch::IntegrationTest
     assert_match(/Debés seleccionar al menos un día/, flash[:alert])
   end
 end
-

@@ -10,7 +10,6 @@ class CreatePricingRules < ActiveRecord::Migration[8.1]
       t.timestamps
     end
 
-    add_index :pricing_rules, [:pricing_scheme_id, :day_of_week]
+    add_index :pricing_rules, [ :pricing_scheme_id, :day_of_week ]
   end
 end
-

@@ -4,4 +4,3 @@ class AddPricingSchemesToCourtsAndComplexes < ActiveRecord::Migration[8.1]
     add_reference :sports_complexes, :default_pricing_scheme, foreign_key: { to_table: :pricing_schemes }, null: true
   end
 end
-

@@ -140,4 +140,3 @@ class PricingRuleTest < ActiveSupport::TestCase
     assert_not rule.covers?("22:00", "23:30")
   end
 end
-

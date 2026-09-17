@@ -12,7 +12,7 @@ class TimeSlot < ApplicationRecord
   }.freeze
 
   # Orden natural de visualización de la semana: Lunes (1) a Domingo (0)
-  DAY_ORDER = [1, 2, 3, 4, 5, 6, 0].freeze
+  DAY_ORDER = [ 1, 2, 3, 4, 5, 6, 0 ].freeze
 
   before_validation :sync_price_and_multiplier
 

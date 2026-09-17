@@ -38,7 +38,7 @@ end
 
 # Lunes a Viernes 08:00-18:00 -> 1.0
 tarifa_estandar.add_rules(
-  days_of_week: [1, 2, 3, 4, 5],
+  days_of_week: [ 1, 2, 3, 4, 5 ],
   start_time: "08:00",
   end_time: "18:00",
   multiplier: 1.0
@@ -46,7 +46,7 @@ tarifa_estandar.add_rules(
 
 # Lunes a Viernes 18:00-23:00 -> 1.5
 tarifa_estandar.add_rules(
-  days_of_week: [1, 2, 3, 4, 5],
+  days_of_week: [ 1, 2, 3, 4, 5 ],
   start_time: "18:00",
   end_time: "23:00",
   multiplier: 1.5
@@ -54,7 +54,7 @@ tarifa_estandar.add_rules(
 
 # Sábado 10:00-23:00 -> 1.3
 tarifa_estandar.add_rules(
-  days_of_week: [6],
+  days_of_week: [ 6 ],
   start_time: "10:00",
   end_time: "23:00",
   multiplier: 1.3
@@ -62,7 +62,7 @@ tarifa_estandar.add_rules(
 
 # Domingo 10:00-22:00 -> 1.2
 tarifa_estandar.add_rules(
-  days_of_week: [0],
+  days_of_week: [ 0 ],
   start_time: "10:00",
   end_time: "22:00",
   multiplier: 1.2
@@ -73,13 +73,13 @@ tarifa_promo = PricingScheme.find_or_create_by!(name: "Tarifa Promocional Pádel
   s.description = "Esquema especial con descuento para Pádel diurno."
 end
 tarifa_promo.add_rules(
-  days_of_week: [1, 2, 3, 4, 5],
+  days_of_week: [ 1, 2, 3, 4, 5 ],
   start_time: "09:00",
   end_time: "17:00",
   multiplier: 0.8
 )
 tarifa_promo.add_rules(
-  days_of_week: [1, 2, 3, 4, 5],
+  days_of_week: [ 1, 2, 3, 4, 5 ],
   start_time: "17:00",
   end_time: "23:00",
   multiplier: 1.4

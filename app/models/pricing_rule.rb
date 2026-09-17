@@ -98,4 +98,3 @@ class PricingRule < ApplicationRecord
     end
   end
 end
-

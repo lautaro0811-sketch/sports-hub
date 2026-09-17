@@ -23,7 +23,7 @@ class PricingSchemeTest < ActiveSupport::TestCase
   test "debe permitir generar reglas para múltiples días automáticamente" do
     # Lunes a Viernes (1 al 5)
     result = @scheme.add_rules(
-      days_of_week: [1, 2, 3, 4, 5],
+      days_of_week: [ 1, 2, 3, 4, 5 ],
       start_time: "18:00",
       end_time: "23:00",
       multiplier: 1.5
@@ -53,7 +53,7 @@ class PricingSchemeTest < ActiveSupport::TestCase
 
     # Intentamos crear masivamente de lunes a viernes 18:00 a 22:00 (colisiona con miércoles)
     result = @scheme.add_rules(
-      days_of_week: [1, 2, 3, 4, 5],
+      days_of_week: [ 1, 2, 3, 4, 5 ],
       start_time: "18:00",
       end_time: "22:00",
       multiplier: 1.5
@@ -121,4 +121,3 @@ class PricingSchemeTest < ActiveSupport::TestCase
     assert_equal 1.0, @scheme.multiplier_for(2, "18:00", "19:00")
   end
 end
-

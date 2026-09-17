@@ -5,7 +5,7 @@ module Admin
     def index
       @time_slots = @court.time_slots.order(:day_of_week, :start_time)
       @time_slot = @court.time_slots.build
-      
+
       @slots_by_day = TimeSlot::DAY_ORDER.each_with_object({}) do |day, hash|
         hash[day] = @time_slots.select { |s| s.day_of_week == day }
       end
@@ -48,7 +48,7 @@ module Admin
         while curr + step_sec <= end_sec
           s_hour = format("%02d:%02d", curr / 3600, (curr % 3600) / 60)
           e_hour = format("%02d:%02d", (curr + step_sec) / 3600, ((curr + step_sec) % 3600) / 60)
-          intervals << [s_hour, e_hour]
+          intervals << [ s_hour, e_hour ]
           curr += step_sec
         end
 
@@ -57,7 +57,7 @@ module Admin
           return
         end
       else
-        intervals = [[start_str, end_str]]
+        intervals = [ [ start_str, end_str ] ]
       end
 
       created_count = 0
