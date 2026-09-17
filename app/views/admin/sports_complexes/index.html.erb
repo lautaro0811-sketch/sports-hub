@@ -12,6 +12,7 @@
       <th>Ciudad</th>
       <th>Teléfono</th>
       <th>Canchas</th>
+      <th>Tarifa Predeterminada</th>
       <th class="text-right">Acciones</th>
     </tr>
   </thead>
@@ -34,6 +35,13 @@
           <td><%= complex.phone %></td>
           <td><%= complex.courts.count %></td>
           <td>
+            <% if complex.default_pricing_scheme.present? %>
+              <%= link_to complex.default_pricing_scheme.name, admin_pricing_scheme_path(complex.default_pricing_scheme), class: "badge badge-success", style: "text-decoration: none;" %>
+            <% else %>
+              <span class="table-subtext">Sin esquema (Base 1.0)</span>
+            <% end %>
+          </td>
+          <td>
             <div class="table-actions">
               <%= link_to "Editar", edit_admin_sports_complex_path(complex), class: "btn btn-sm btn-secondary" %>
               <%= button_to "Eliminar", admin_sports_complex_path(complex), method: :delete, data: { turbo_confirm: "¿Seguro que querés eliminar este complejo?" }, class: "btn btn-sm btn-danger" %>
@@ -43,7 +51,7 @@
       <% end %>
     <% else %>
       <tr>
-        <td colspan="7" class="table-empty">
+        <td colspan="8" class="table-empty">
           No hay complejos registrados todavía.
         </td>
       </tr>

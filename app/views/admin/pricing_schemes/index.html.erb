@@ -1,0 +1,73 @@
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Esquemas Tarifarios</h1>
+    <p style="margin: 4px 0 0 0; color: var(--text-muted); font-size: 14px;">
+      Plantillas reutilizables con reglas horarias y multiplicadores de precio aplicables a canchas y complejos.
+    </p>
+  </div>
+  <%= link_to "Nuevo Esquema", new_admin_pricing_scheme_path, class: "btn btn-primary" %>
+</div>
+
+<table class="admin-table">
+  <thead>
+    <tr>
+      <th>Nombre</th>
+      <th>Descripción</th>
+      <th>Reglas Horarias</th>
+      <th>Canchas Asociadas</th>
+      <th>Complejos Predeterminados</th>
+      <th class="text-right">Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% if @pricing_schemes.any? %>
+      <% @pricing_schemes.each do |scheme| %>
+        <tr>
+          <td>
+            <strong><%= scheme.name %></strong>
+          </td>
+          <td>
+            <%= scheme.description.presence || raw('<span class="table-subtext">Sin descripción</span>') %>
+          </td>
+          <td>
+            <span class="badge badge-secondary">
+              <%= scheme.pricing_rules.size %> regla(s)
+            </span>
+          </td>
+          <td>
+            <% total_courts = scheme.total_associated_courts %>
+            <% if total_courts > 0 %>
+              <span class="badge badge-success"><%= total_courts %> cancha(s)</span>
+              <% if scheme.courts.any? %>
+                <span class="table-subtext"><%= scheme.courts.size %> asignación(es) directa(s)</span>
+              <% end %>
+            <% else %>
+              <span class="table-subtext">Ninguna cancha asociada</span>
+            <% end %>
+          </td>
+          <td>
+            <% if scheme.sports_complexes.any? %>
+              <%= scheme.sports_complexes.map(&:name).join(", ") %>
+            <% else %>
+              <span class="table-subtext">—</span>
+            <% end %>
+          </td>
+          <td>
+            <div class="table-actions text-right">
+              <%= link_to "Gestionar Reglas", admin_pricing_scheme_path(scheme), class: "btn btn-sm btn-primary" %>
+              <%= link_to "Editar", edit_admin_pricing_scheme_path(scheme), class: "btn btn-sm btn-secondary" %>
+              <%= button_to "Eliminar", admin_pricing_scheme_path(scheme), method: :delete, data: { turbo_confirm: "¿Estás seguro de eliminar el esquema \"#{scheme.name}\"? Sus canchas pasarán a tarifa base 1.0." }, class: "btn btn-sm btn-danger" %>
+            </div>
+          </td>
+        </tr>
+      <% end %>
+    <% else %>
+      <tr>
+        <td colspan="6" class="table-empty">
+          No hay esquemas tarifarios creados todavía. Hacé clic en "Nuevo Esquema" para crear uno.
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
