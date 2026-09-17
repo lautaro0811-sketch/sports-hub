@@ -40,10 +40,10 @@ class Court < ApplicationRecord
   scope :with_time_slot_at, ->(day_of_week, time_str) {
     where(
       "EXISTS (
-        SELECT 1 FROM time_slots 
-        WHERE time_slots.court_id = courts.id 
-          AND time_slots.day_of_week = :wday 
-          AND time_slots.start_time <= :time 
+        SELECT 1 FROM time_slots
+        WHERE time_slots.court_id = courts.id
+          AND time_slots.day_of_week = :wday
+          AND time_slots.start_time <= :time
           AND time_slots.end_time > :time
       )",
       wday: day_of_week,
@@ -55,11 +55,11 @@ class Court < ApplicationRecord
   scope :without_reservation_at, ->(date, time_str) {
     where(
       "NOT EXISTS (
-        SELECT 1 FROM reservations 
-        WHERE reservations.court_id = courts.id 
-          AND reservations.reservation_date = :date 
-          AND reservations.status != :cancelled_status 
-          AND reservations.start_time <= :time 
+        SELECT 1 FROM reservations
+        WHERE reservations.court_id = courts.id
+          AND reservations.reservation_date = :date
+          AND reservations.status != :cancelled_status
+          AND reservations.start_time <= :time
           AND reservations.end_time > :time
       )",
       date: date,

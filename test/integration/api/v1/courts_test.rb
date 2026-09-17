@@ -135,4 +135,3 @@ class Api::V1::CourtsTest < ActionDispatch::IntegrationTest
     assert_not_includes court_ids, @court.id
   end
 end
-

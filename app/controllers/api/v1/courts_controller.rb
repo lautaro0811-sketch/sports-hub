@@ -11,9 +11,9 @@ module Api
                             .includes(
                               :sport,
                               :time_slots,
-                              :pricing_scheme => :pricing_rules,
-                              :sports_complex => { default_pricing_scheme: :pricing_rules },
-                              :reservations
+                              :reservations,
+                              pricing_scheme: :pricing_rules,
+                              sports_complex: { default_pricing_scheme: :pricing_rules }
                             )
 
         # Filtro por Deporte (ID o Nombre)
@@ -33,9 +33,9 @@ module Api
         @court = scope.includes(
                         :sport,
                         :time_slots,
-                        :pricing_scheme => :pricing_rules,
-                        :sports_complex => { default_pricing_scheme: :pricing_rules },
-                        :reservations
+                        :reservations,
+                        pricing_scheme: :pricing_rules,
+                        sports_complex: { default_pricing_scheme: :pricing_rules }
                       )
                       .find(params[:id])
       rescue ActiveRecord::RecordNotFound
@@ -57,9 +57,9 @@ module Api
       def set_target_date
         @date = if search_params[:date].present?
                   Date.parse(search_params[:date].to_s)
-                else
+        else
                   Date.current
-                end
+        end
       rescue Date::Error
         render json: { error: "Formato de fecha inválido. Usar YYYY-MM-DD" }, status: :bad_request
       end

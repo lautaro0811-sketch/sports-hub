@@ -15,4 +15,3 @@ json.pricing do
   json.final_price final_price.to_f
 end
 json.available available
-

@@ -81,4 +81,3 @@ class Admin::ReservationsTest < ActionDispatch::IntegrationTest
     assert_select ".pagination-links a[href*='sports_complex_id=#{@sports_complex.id}']"
   end
 end
-

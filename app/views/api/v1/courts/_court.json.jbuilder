@@ -19,4 +19,3 @@ slots_for_day = court.time_slots.select { |slot| slot.day_of_week == date.wday }
 json.time_slots slots_for_day do |slot|
   json.partial! "api/v1/courts/time_slot", slot: slot, court: court, date: date
 end
-
