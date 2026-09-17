@@ -3,7 +3,7 @@ module Admin
     before_action :set_sports_complex, only: [ :edit, :update, :destroy ]
 
     def index
-      @sports_complexes = SportsComplex.all
+      @sports_complexes = SportsComplex.includes(:default_pricing_scheme, :courts).all
     end
 
     def new
@@ -41,7 +41,7 @@ module Admin
     end
 
     def sports_complex_params
-      params.require(:sports_complex).permit(:name, :address, :city, :phone, :cover_photo)
+      params.require(:sports_complex).permit(:name, :address, :city, :phone, :cover_photo, :default_pricing_scheme_id)
     end
   end
 end

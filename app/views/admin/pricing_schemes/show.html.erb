@@ -1,0 +1,187 @@
+<div class="page-header">
+  <div>
+    <h1 class="page-title"><%= @pricing_scheme.name %></h1>
+    <p style="margin: 4px 0 0 0; color: var(--text-muted); font-size: 14px;">
+      <%= @pricing_scheme.description.presence || "Esquema tarifario reutilizable" %>
+    </p>
+  </div>
+  <div class="table-actions">
+    <%= link_to "Editar Esquema", edit_admin_pricing_scheme_path(@pricing_scheme), class: "btn btn-secondary" %>
+    <%= link_to "Volver a Esquemas", admin_pricing_schemes_path, class: "btn btn-secondary" %>
+  </div>
+</div>
+
+<!-- 1. FORMULARIO PARA AGREGAR NUEVA REGLA (MULTIDÍA Y RANGO COMPLETO) -->
+<div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 24px; margin-bottom: 30px; box-shadow: var(--shadow-sm);">
+  <h3 style="margin-top: 0; margin-bottom: 8px; font-size: 1.25rem;">Agregar Reglas Tarifarias</h3>
+  <p style="margin-top: 0; margin-bottom: 16px; color: var(--text-muted); font-size: 13px;">
+    Seleccioná uno o más días y definí el rango horario completo (ej. 18:00 a 23:00) junto con su multiplicador. Al guardar, se crearán las reglas automáticamente para cada día seleccionado.
+  </p>
+
+  <%= form_with(model: [:admin, @pricing_scheme, @new_rule], local: true) do |f| %>
+    <!-- Selección de Días -->
+    <div style="margin-bottom: 18px;">
+      <label class="form-label" style="margin-bottom: 8px;">Días de la semana:</label>
+      
+      <!-- Botones de selección rápida -->
+      <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
+        <button type="button" class="btn btn-sm btn-secondary" onclick="selectDays([1,2,3,4,5])">Lunes a Viernes</button>
+        <button type="button" class="btn btn-sm btn-secondary" onclick="selectDays([6,0])">Fin de Semana (Sáb-Dom)</button>
+        <button type="button" class="btn btn-sm btn-secondary" onclick="selectDays([1,2,3,4,5,6,0])">Todos los días</button>
+        <button type="button" class="btn btn-sm btn-secondary" onclick="selectDays([])">Desmarcar todos</button>
+      </div>
+
+      <div style="display: flex; gap: 16px; flex-wrap: wrap; background: #f8fafc; padding: 12px 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+        <% [
+          ['Lunes', 1], ['Martes', 2], ['Miércoles', 3], 
+          ['Jueves', 4], ['Viernes', 5], ['Sábado', 6], ['Domingo', 0]
+        ].each do |nombre, dia_val| %>
+          <label style="display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-size: 14px; font-weight: 500;">
+            <%= check_box_tag "pricing_rule[days_of_week][]", dia_val, (@selected_days || []).include?(dia_val), id: "day_#{dia_val}", class: "day-checkbox" %>
+            <%= nombre %>
+          </label>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Campos de Rango Horario y Multiplicador -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; align-items: flex-end; margin-bottom: 20px;">
+      <div>
+        <%= f.label :start_time, "Hora de Inicio", class: "form-label" %>
+        <%= f.time_field :start_time, required: true, class: "form-input", value: @new_rule.formatted_start_time || "18:00" %>
+      </div>
+
+      <div>
+        <%= f.label :end_time, "Hora de Fin", class: "form-label" %>
+        <%= f.time_field :end_time, required: true, class: "form-input", value: @new_rule.formatted_end_time || "23:00" %>
+      </div>
+
+      <div>
+        <%= f.label :multiplier, "Multiplicador (Ej: 1.5)", class: "form-label" %>
+        <%= f.number_field :multiplier, step: 0.05, min: 0.05, required: true, class: "form-input", value: @new_rule.multiplier || 1.5 %>
+      </div>
+
+      <div>
+        <%= f.submit "Guardar Reglas", class: "btn btn-primary btn-block" %>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<!-- 2. VISUALIZACIÓN DE REGLAS EXISTENTES AGRUPADAS POR DÍA -->
+<div style="margin-bottom: 35px;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+    <h2 style="margin: 0; font-size: 1.3rem;">Reglas Configuradas por Día</h2>
+    <span style="font-size: 13px; color: var(--text-muted);">
+      Total: <strong><%= @pricing_scheme.pricing_rules.count %></strong> regla(s) activas
+    </span>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px;">
+    <% PricingRule::DAYS.each do |day_val, day_name| %>
+      <% day_rules = @rules_by_day[day_val] || [] %>
+      <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm);">
+        <!-- Encabezado del día -->
+        <div style="background: var(--table-header-bg); padding: 10px 16px; font-weight: 600; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color);">
+          <span><%= day_name %></span>
+          <span class="badge <%= day_rules.any? ? 'badge-secondary' : '' %>" style="font-size: 11px;">
+            <%= day_rules.size %> regla(s)
+          </span>
+        </div>
+
+        <!-- Lista de reglas para el día -->
+        <div style="padding: 12px 16px;">
+          <% if day_rules.any? %>
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <% day_rules.each do |rule| %>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: var(--radius-md);">
+                  <div>
+                    <strong style="font-size: 14px;"><%= rule.formatted_time_range %></strong>
+                    <div style="margin-top: 2px;">
+                      <span class="badge <%= rule.multiplier > 1.0 ? 'badge-success' : (rule.multiplier < 1.0 ? 'badge-warning' : 'badge-secondary') %>">
+                        x <%= rule.multiplier %>
+                      </span>
+                      <span style="font-size: 11px; color: var(--text-muted); margin-left: 4px;">
+                        <% if rule.multiplier > 1.0 %>
+                          (+<%= ((rule.multiplier - 1.0) * 100).round %>%)
+                        <% elsif rule.multiplier < 1.0 %>
+                          (-<%= ((1.0 - rule.multiplier) * 100).round %>%)
+                        <% else %>
+                          (Tarifa estándar)
+                        <% end %>
+                      </span>
+                    </div>
+                  </div>
+                  <div class="table-actions">
+                    <%= link_to "Editar", edit_admin_pricing_scheme_pricing_rule_path(@pricing_scheme, rule), class: "btn btn-sm btn-secondary", style: "padding: 4px 8px; font-size: 12px;" %>
+                    <%= button_to "✕", admin_pricing_scheme_pricing_rule_path(@pricing_scheme, rule), method: :delete, data: { turbo_confirm: "¿Eliminar regla #{rule.formatted_time_range} para #{rule.day_name}?" }, class: "btn btn-sm btn-danger", style: "padding: 4px 8px; font-size: 12px;" %>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          <% else %>
+            <p style="margin: 0; color: var(--text-muted); font-size: 13px; font-style: italic; padding: 8px 0;">
+              Sin reglas configuradas (se aplica multiplicador 1.0).
+            </p>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<!-- 3. ASIGNACIÓN MASIVA A CANCHAS -->
+<div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow-sm);">
+  <h2 style="margin-top: 0; margin-bottom: 8px; font-size: 1.25rem;">Asignar este Esquema a Canchas</h2>
+  <p style="margin-top: 0; margin-bottom: 16px; color: var(--text-muted); font-size: 13px;">
+    Marcá las canchas que deben utilizar directamente este esquema tarifario. Si una cancha no tiene esquema propio asignado, heredará el esquema predeterminado de su complejo (si tiene uno configurado).
+  </p>
+
+  <%= form_with(url: assign_courts_admin_pricing_scheme_path(@pricing_scheme), method: :post, local: true) do |f| %>
+    <% if @all_courts.any? %>
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; margin-bottom: 20px;">
+        <% @all_courts.each do |court| %>
+          <% is_direct = court.pricing_scheme_id == @pricing_scheme.id %>
+          <% is_inherited = court.pricing_scheme_id.nil? && court.sports_complex&.default_pricing_scheme_id == @pricing_scheme.id %>
+          <label style="display: flex; align-items: flex-start; gap: 10px; padding: 12px; border: 1px solid <%= is_direct ? 'var(--primary-color)' : '#e2e8f0' %>; background: <%= is_direct ? '#eff6ff' : '#ffffff' %>; border-radius: var(--radius-md); cursor: pointer;">
+            <%= check_box_tag "court_ids[]", court.id, is_direct, id: "court_#{court.id}", style: "margin-top: 3px;" %>
+            <div style="flex: 1;">
+              <strong style="font-size: 14px; display: block;"><%= court.name %></strong>
+              <span style="font-size: 12px; color: var(--text-muted); display: block;">
+                <%= court.sports_complex.name %> &bull; <%= court.sport.name %>
+              </span>
+              <span style="font-size: 12px; color: #166534; font-weight: 500;">
+                Precio base: $<%= number_with_precision(court.base_price, precision: 2) %>
+              </span>
+              <% if is_inherited %>
+                <span class="badge badge-secondary" style="font-size: 10px; margin-top: 4px; display: inline-block;">
+                  Hereda por complejo
+                </span>
+              <% elsif court.pricing_scheme_id.present? && !is_direct %>
+                <span class="badge badge-warning" style="font-size: 10px; margin-top: 4px; display: inline-block;">
+                  Tiene otro esquema: <%= court.pricing_scheme.name %>
+                </span>
+              <% end %>
+            </div>
+          </label>
+        <% end %>
+      </div>
+
+      <div class="form-actions" style="margin-top: 0;">
+        <%= f.submit "Guardar Asignación de Canchas", class: "btn btn-primary" %>
+      </div>
+    <% else %>
+      <p style="color: var(--text-muted); font-style: italic;">No hay canchas registradas en el sistema.</p>
+    <% end %>
+  <% end %>
+</div>
+
+<script>
+  function selectDays(daysArray) {
+    var checkboxes = document.querySelectorAll('.day-checkbox');
+    checkboxes.forEach(function(cb) {
+      cb.checked = daysArray.includes(parseInt(cb.value));
+    });
+  }
+</script>
+

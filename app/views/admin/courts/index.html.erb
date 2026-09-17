@@ -1,5 +1,10 @@
 <div class="page-header">
-  <h1 class="page-title">Canchas</h1>
+  <div>
+    <h1 class="page-title">Canchas</h1>
+    <p style="margin: 4px 0 0 0; color: var(--text-muted); font-size: 14px;">
+      Administración de canchas, precios base, esquemas tarifarios asociados y disponibilidad.
+    </p>
+  </div>
   <%= link_to "Nueva Cancha", new_admin_court_path, class: "btn btn-primary" %>
 </div>
 
@@ -9,7 +14,8 @@
       <th>Nombre</th>
       <th>Complejo</th>
       <th>Deporte</th>
-      <th>Superficie</th>
+      <th>Precio Base</th>
+      <th>Esquema Tarifario</th>
       <th>Estado</th>
       <th class="text-right">Acciones</th>
     </tr>
@@ -21,7 +27,20 @@
           <td><strong><%= court.name %></strong></td>
           <td><%= court.sports_complex.name %></td>
           <td><%= court.sport.name %></td>
-          <td><%= court.surface_type %></td>
+          <td>
+            <strong style="color: #166534;">$<%= number_with_precision(court.base_price, precision: 2) %></strong>
+          </td>
+          <td>
+            <% if court.pricing_scheme_id.present? %>
+              <span class="badge badge-success"><%= court.pricing_scheme.name %></span>
+              <span class="table-subtext">Personalizado</span>
+            <% elsif court.sports_complex&.default_pricing_scheme.present? %>
+              <span class="badge badge-secondary"><%= court.sports_complex.default_pricing_scheme.name %></span>
+              <span class="table-subtext">Heredado del complejo</span>
+            <% else %>
+              <span class="table-subtext">Sin esquema (Multiplicador 1.0)</span>
+            <% end %>
+          </td>
           <td>
             <% if court.is_active? %>
               <span class="badge badge-success">Activa</span>
@@ -30,7 +49,8 @@
             <% end %>
           </td>
           <td>
-            <div class="table-actions">
+            <div class="table-actions text-right">
+              <%= link_to "Turnos", admin_court_time_slots_path(court), class: "btn btn-sm btn-primary", title: "Configurar franjas de disponibilidad" %>
               <%= link_to "Editar", edit_admin_court_path(court), class: "btn btn-sm btn-secondary" %>
               <%= button_to "Eliminar", admin_court_path(court), method: :delete, data: { turbo_confirm: "¿Seguro que querés eliminar la cancha #{court.name}?" }, class: "btn btn-sm btn-danger" %>
             </div>
@@ -39,7 +59,7 @@
       <% end %>
     <% else %>
       <tr>
-        <td colspan="6" class="table-empty">
+        <td colspan="7" class="table-empty">
           No hay canchas registradas todavía.
         </td>
       </tr>

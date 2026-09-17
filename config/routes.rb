@@ -10,8 +10,19 @@ Rails.application.routes.draw do
   namespace :admin do
     root to: "sports_complexes#index"
     resources :sports_complexes
+    resources :pricing_schemes do
+      member do
+        post :assign_courts
+      end
+      resources :pricing_rules, only: %i[create edit update destroy]
+    end
     resources :courts do
-      resources :time_slots, only: %i[index create destroy]
+      resources :time_slots, only: %i[index create destroy] do
+        collection do
+          delete :destroy_all
+          delete :destroy_day
+        end
+      end
     end
     resources :reservations, only: %i[index show update]
   end

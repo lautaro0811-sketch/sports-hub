@@ -11,12 +11,16 @@ class ReservationTest < ActiveSupport::TestCase
 
     @sport = Sport.find_or_create_by!(name: "Fútbol Test")
 
-    # Guardamos el complejo y la cancha saltando sus propias validaciones
-    # para no tener que armar toda la cadena de City, Province, etc.
-    @complex = SportsComplex.new(name: "Complejo Test", address: "Calle 123")
+    @complex = SportsComplex.new(name: "Complejo Test", address: "Calle 123", city: "La Plata")
     @complex.save(validate: false)
 
-    @court = Court.new(name: "Cancha Test", surface_type: "Sintético", sport: @sport, sports_complex: @complex)
+    @court = Court.new(
+      name: "Cancha Test",
+      surface_type: "Sintético",
+      sport: @sport,
+      sports_complex: @complex,
+      base_price: 45000.0
+    )
     @court.save(validate: false)
 
     @tomorrow = Date.tomorrow
@@ -33,6 +37,65 @@ class ReservationTest < ActiveSupport::TestCase
 
     assert reservation.valid?
     assert reservation.save
+  end
+
+  test "calcula automáticamente total_price según regla tarifaria de la cancha" do
+    scheme = PricingScheme.create!(name: "Esquema Reserva")
+    # Regla para el día de mañana
+    scheme.pricing_rules.create!(
+      day_of_week: @tomorrow.wday,
+      start_time: "18:00",
+      end_time: "23:00",
+      multiplier: 1.5
+    )
+    @court.update!(pricing_scheme: scheme, base_price: 45000.0)
+
+    reservation = Reservation.create!(
+      user: @user,
+      court: @court,
+      reservation_date: @tomorrow,
+      start_time: Time.zone.parse("#{@tomorrow} 18:00"),
+      end_time: Time.zone.parse("#{@tomorrow} 19:00")
+    )
+
+    # 45000 * 1.5 * 1.0 = 67500.0
+    assert_equal 67500.0, reservation.total_price
+  end
+
+  test "calcula total_price considerando esquema heredado del complejo" do
+    scheme = PricingScheme.create!(name: "Esquema Complejo Reserva")
+    scheme.pricing_rules.create!(
+      day_of_week: @tomorrow.wday,
+      start_time: "18:00",
+      end_time: "23:00",
+      multiplier: 1.3
+    )
+    @complex.update!(default_pricing_scheme: scheme)
+    @court.update!(pricing_scheme: nil, base_price: 40000.0)
+
+    reservation = Reservation.create!(
+      user: @user,
+      court: @court,
+      reservation_date: @tomorrow,
+      start_time: Time.zone.parse("#{@tomorrow} 18:00"),
+      end_time: Time.zone.parse("#{@tomorrow} 19:00")
+    )
+
+    # 40000 * 1.3 * 1.0 = 52000.0
+    assert_equal 52000.0, reservation.total_price
+  end
+
+  test "respeta total_price si fue especificado explícitamente" do
+    reservation = Reservation.create!(
+      user: @user,
+      court: @court,
+      reservation_date: @tomorrow,
+      start_time: Time.zone.parse("#{@tomorrow} 18:00"),
+      end_time: Time.zone.parse("#{@tomorrow} 19:00"),
+      total_price: 99999.0
+    )
+
+    assert_equal 99999.0, reservation.total_price
   end
 
   test "no debe permitir solapamiento en la misma cancha" do

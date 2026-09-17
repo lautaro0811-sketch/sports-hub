@@ -21,9 +21,7 @@ class Reservation < ApplicationRecord
   def calculate_total_price
     return if total_price.present? || court.blank? || start_time.blank? || end_time.blank?
 
-    # Asigna precio de referencia si aún no se definió
-    duration = ((end_time - start_time) / 1.hour).to_f
-    self.total_price = duration * 5000.0 # Tarifa base
+    self.total_price = court.calculate_price(reservation_date, start_time, end_time)
   end
 
   # no reservar fechas anteriores
@@ -41,7 +39,7 @@ class Reservation < ApplicationRecord
 
     overlapping = Reservation.where(court_id: court_id, reservation_date: reservation_date)
                              .where.not(id: id)
-                             .where.not(status: :cancelled) # CAMBIO: Mantuve tu excelente lógica y alineé la cadena de consultas
+                             .where.not(status: :cancelled)
                              .where("start_time < ? AND end_time > ?", end_time, start_time)
 
     if overlapping.exists?

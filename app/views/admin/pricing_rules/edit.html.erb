@@ -1,0 +1,51 @@
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Editar Regla Tarifaria</h1>
+    <p style="margin: 4px 0 0 0; color: var(--text-muted); font-size: 14px;">
+      Esquema: <strong><%= @pricing_scheme.name %></strong>
+    </p>
+  </div>
+  <%= link_to "Volver al Esquema", admin_pricing_scheme_path(@pricing_scheme), class: "btn btn-secondary" %>
+</div>
+
+<%= form_with(model: [:admin, @pricing_scheme, @pricing_rule], local: true, class: "admin-card") do |f| %>
+  <% if @pricing_rule.errors.any? %>
+    <div class="form-errors">
+      <h3>Se encontraron <%= @pricing_rule.errors.count %> error(es) al modificar la regla:</h3>
+      <ul>
+        <% @pricing_rule.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="form-group">
+    <%= f.label :day_of_week, "Día de la semana", class: "form-label" %>
+    <%= f.select :day_of_week, [
+      ['Lunes', 1], ['Martes', 2], ['Miércoles', 3], 
+      ['Jueves', 4], ['Viernes', 5], ['Sábado', 6], ['Domingo', 0]
+    ], {}, class: "form-input" %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :start_time, "Hora de Inicio", class: "form-label" %>
+    <%= f.time_field :start_time, required: true, class: "form-input", value: @pricing_rule.formatted_start_time %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :end_time, "Hora de Fin", class: "form-label" %>
+    <%= f.time_field :end_time, required: true, class: "form-input", value: @pricing_rule.formatted_end_time %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :multiplier, "Multiplicador de Tarifa (ej. 1.5)", class: "form-label" %>
+    <%= f.number_field :multiplier, step: 0.05, min: 0.05, required: true, class: "form-input" %>
+  </div>
+
+  <div class="form-actions">
+    <%= f.submit "Actualizar Regla", class: "btn btn-primary" %>
+    <%= link_to "Cancelar", admin_pricing_scheme_path(@pricing_scheme), class: "btn btn-secondary" %>
+  </div>
+<% end %>
+
