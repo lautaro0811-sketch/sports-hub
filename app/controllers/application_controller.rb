@@ -1,4 +1,6 @@
 class ApplicationController < ActionController::Base
+  include Pagy::Backend
+
   helper_method :current_user, :current_admin_user, :current_customer, :logged_in?
 
   private

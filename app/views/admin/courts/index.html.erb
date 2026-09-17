@@ -8,6 +8,48 @@
   <%= link_to "Nueva Cancha", new_admin_court_path, class: "btn btn-primary" %>
 </div>
 
+<div class="filter-card">
+  <%= form_with url: admin_courts_path, method: :get, local: true, class: "filter-form" do |f| %>
+    <!-- Búsqueda por Nombre -->
+    <div class="filter-group filter-group-main">
+      <%= f.label :name, "Buscar por nombre", class: "visually-hidden" %>
+      <%= f.text_field :name,
+                       value: params[:name],
+                       placeholder: "Buscar por nombre de cancha...",
+                       class: "form-input",
+                       "aria-label": "Buscar por nombre de cancha" %>
+    </div>
+
+    <!-- Filtro por Complejo Deportivo -->
+    <div class="filter-group">
+      <%= f.label :sports_complex_id, "Complejo Deportivo", class: "visually-hidden" %>
+      <%= f.select :sports_complex_id,
+                   options_from_collection_for_select(@sports_complexes, :id, :name, params[:sports_complex_id]),
+                   { include_blank: "Todos los complejos" },
+                   class: "form-input",
+                   "aria-label": "Filtrar por complejo deportivo" %>
+    </div>
+
+    <!-- Filtro por Deporte -->
+    <div class="filter-group">
+      <%= f.label :sport_id, "Deporte", class: "visually-hidden" %>
+      <%= f.select :sport_id,
+                   options_from_collection_for_select(@sports, :id, :name, params[:sport_id]),
+                   { include_blank: "Todos los deportes" },
+                   class: "form-input",
+                   "aria-label": "Filtrar por deporte" %>
+    </div>
+
+    <!-- Acciones de Búsqueda -->
+    <div class="filter-actions">
+      <%= f.submit "Buscar", class: "btn btn-primary" %>
+      <% if params[:name].present? || params[:sports_complex_id].present? || params[:sport_id].present? %>
+        <%= link_to "Limpiar", admin_courts_path, class: "btn btn-secondary", title: "Restablecer filtros" %>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+
 <table class="admin-table">
   <thead>
     <tr>
@@ -60,9 +102,24 @@
     <% else %>
       <tr>
         <td colspan="7" class="table-empty">
-          No hay canchas registradas todavía.
+          <% if params[:name].present? || params[:sports_complex_id].present? || params[:sport_id].present? %>
+            No se encontraron canchas que coincidan con los criterios de búsqueda.
+          <% else %>
+            No hay canchas registradas todavía.
+          <% end %>
         </td>
       </tr>
     <% end %>
   </tbody>
 </table>
+
+<% if defined?(@pagy) && @pagy && @pagy.pages > 1 %>
+  <div class="pagination-container">
+    <div class="pagination-info">
+      Mostrando <strong><%= @pagy.from %></strong> - <strong><%= @pagy.to %></strong> de <strong><%= @pagy.count %></strong> canchas
+    </div>
+    <div class="pagination-links">
+      <%== pagy_nav(@pagy) %>
+    </div>
+  </div>
+<% end %>

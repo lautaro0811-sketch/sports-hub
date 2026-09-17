@@ -11,6 +11,20 @@ class Court < ApplicationRecord
 
   scope :active, -> { where(is_active: true) }
 
+  # Búsqueda parcial por nombre (case-insensitive)
+  scope :search_by_name, ->(query) {
+    return all if query.blank?
+
+    where("LOWER(courts.name) LIKE LOWER(?)", "%#{sanitize_sql_like(query.to_s.strip)}%")
+  }
+
+  # Filtro por complejo deportivo
+  scope :by_sports_complex, ->(complex_id) {
+    return all if complex_id.blank?
+
+    where(sports_complex_id: complex_id)
+  }
+
   # Filtro por deporte: acepta ID numérico o nombre del deporte (case-insensitive)
   scope :by_sport, ->(sport_param) {
     return all if sport_param.blank?

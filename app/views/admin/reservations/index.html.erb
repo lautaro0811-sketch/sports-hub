@@ -8,51 +8,50 @@
 </div>
 
 <div class="filter-card">
-  <%= form_with url: admin_reservations_path, method: :get, local: true do |f| %>
-    <div class="filter-grid">
-      
-      <!-- Filtro por Complejo Deportivo -->
-      <div class="form-group mb-0">
-        <%= f.label :sports_complex_id, "Complejo Deportivo", class: "form-label" %>
-        <%= f.select :sports_complex_id,
-                     options_from_collection_for_select(@sports_complexes, :id, :name, params[:sports_complex_id]),
-                     { include_blank: "Todos los complejos" },
-                     class: "form-input" %>
-      </div>
+  <%= form_with url: admin_reservations_path, method: :get, local: true, class: "filter-form" do |f| %>
+    <!-- Filtro por Complejo Deportivo -->
+    <div class="filter-group">
+      <%= f.label :sports_complex_id, "Complejo Deportivo", class: "visually-hidden" %>
+      <%= f.select :sports_complex_id,
+                   options_from_collection_for_select(@sports_complexes, :id, :name, params[:sports_complex_id]),
+                   { include_blank: "Todos los complejos" },
+                   class: "form-input",
+                   "aria-label": "Filtrar por complejo deportivo" %>
+    </div>
 
-      <!-- Filtro por Estado -->
-      <div class="form-group mb-0">
-        <%= f.label :status, "Estado", class: "form-label" %>
-        <%= f.select :status,
-                     options_for_select([
-                       ["Confirmada", "confirmed"],
-                       ["Pendiente", "pending"],
-                       ["Cancelada", "cancelled"]
-                     ], params[:status]),
-                     { include_blank: "Todos los estados" },
-                     class: "form-input" %>
-      </div>
+    <!-- Filtro por Estado -->
+    <div class="filter-group">
+      <%= f.label :status, "Estado", class: "visually-hidden" %>
+      <%= f.select :status,
+                   options_for_select([
+                     ["Confirmada", "confirmed"],
+                     ["Pendiente", "pending"],
+                     ["Cancelada", "cancelled"]
+                   ], params[:status]),
+                   { include_blank: "Todos los estados" },
+                   class: "form-input",
+                   "aria-label": "Filtrar por estado" %>
+    </div>
 
-      <!-- Selector de Ordenamiento -->
-      <div class="form-group mb-0">
-        <%= f.label :order_by_date, "Ordenar por Fecha", class: "form-label" %>
-        <%= f.select :order_by_date,
-                     options_for_select([
-                       ["Más recientes primero (Descendente)", "desc"],
-                       ["Más antiguas primero (Ascendente)", "asc"]
-                     ], params[:order_by_date] || "desc"),
-                     {},
-                     class: "form-input" %>
-      </div>
+    <!-- Selector de Ordenamiento -->
+    <div class="filter-group">
+      <%= f.label :order_by_date, "Ordenar por Fecha", class: "visually-hidden" %>
+      <%= f.select :order_by_date,
+                   options_for_select([
+                     ["Fecha: Más recientes", "desc"],
+                     ["Fecha: Más antiguas", "asc"]
+                   ], params[:order_by_date] || "desc"),
+                   {},
+                   class: "form-input",
+                   "aria-label": "Ordenar por fecha" %>
+    </div>
 
-      <!-- Botones de Acción -->
-      <div class="filter-actions">
-        <%= f.submit "Filtrar", class: "btn btn-primary" %>
-        <% if params[:sports_complex_id].present? || params[:status].present? || (params[:order_by_date].present? && params[:order_by_date] != "desc") %>
-          <%= link_to "Limpiar", admin_reservations_path, class: "btn btn-secondary", title: "Limpiar filtros aplicados" %>
-        <% end %>
-      </div>
-
+    <!-- Botones de Acción -->
+    <div class="filter-actions">
+      <%= f.submit "Filtrar", class: "btn btn-primary" %>
+      <% if params[:sports_complex_id].present? || params[:status].present? || (params[:order_by_date].present? && params[:order_by_date] != "desc") %>
+        <%= link_to "Limpiar", admin_reservations_path, class: "btn btn-secondary", title: "Limpiar filtros aplicados" %>
+      <% end %>
     </div>
   <% end %>
 </div>
@@ -109,3 +108,14 @@
     <% end %>
   </tbody>
 </table>
+
+<% if defined?(@pagy) && @pagy && @pagy.pages > 1 %>
+  <div class="pagination-container">
+    <div class="pagination-info">
+      Mostrando <strong><%= @pagy.from %></strong> - <strong><%= @pagy.to %></strong> de <strong><%= @pagy.count %></strong> reservas
+    </div>
+    <div class="pagination-links">
+      <%== pagy_nav(@pagy) %>
+    </div>
+  </div>
+<% end %>

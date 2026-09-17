@@ -3,7 +3,16 @@ module Admin
     before_action :set_court, only: [ :edit, :update, :destroy ]
 
     def index
-      @courts = Court.includes(:sports_complex, :sport, :pricing_scheme).all
+      @sports_complexes = SportsComplex.order(:name)
+      @sports = Sport.order(:name)
+
+      courts_scope = Court.includes(:sports_complex, :sport, :pricing_scheme)
+                          .search_by_name(params[:name])
+                          .by_sports_complex(params[:sports_complex_id])
+                          .by_sport(params[:sport_id])
+                          .order(:name)
+
+      @pagy, @courts = pagy(courts_scope, limit: 10)
     end
 
     def new

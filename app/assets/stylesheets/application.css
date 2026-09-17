@@ -560,9 +560,55 @@ select.form-input {
   background-color: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
-  padding: 18px 20px;
-  margin-bottom: 24px;
+  padding: 10px 16px;
+  margin-bottom: 20px;
   box-shadow: var(--shadow-sm);
+}
+
+.filter-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.filter-group {
+  flex: 1 1 180px;
+  min-width: 140px;
+  margin-bottom: 0;
+}
+
+.filter-group-main {
+  flex: 1.4 1 220px;
+}
+
+.filter-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.filter-actions .btn {
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .filter-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-group,
+  .filter-group-main {
+    width: 100%;
+    flex: 1 1 auto;
+  }
+
+  .filter-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
 }
 
 .filter-grid {
@@ -570,12 +616,6 @@ select.form-input {
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) auto;
   gap: 16px;
   align-items: flex-end;
-}
-
-.filter-actions {
-  display: flex;
-  gap: 8px;
-  align-items: center;
 }
 
 .form-checkbox-label {
@@ -992,4 +1032,83 @@ select.form-input {
 
 .is-hidden {
   display: none !important;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* ==========================================================================
+   16. PAGINACIÓN (Pagy)
+   ========================================================================== */
+.pagination-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+  padding: 12px 16px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.pagination-info {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.pagination-links nav.pagy {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.pagination-links nav.pagy a,
+.pagination-links nav.pagy span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 8px;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  background-color: var(--bg-card);
+  transition: all 0.15s ease;
+}
+
+.pagination-links nav.pagy a:hover {
+  background-color: var(--neutral-bg);
+  border-color: var(--secondary-color);
+}
+
+.pagination-links nav.pagy .current,
+.pagination-links nav.pagy span.active {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  color: var(--text-inverse);
+  font-weight: 600;
+}
+
+.pagination-links nav.pagy .disabled,
+.pagination-links nav.pagy span.disabled {
+  color: var(--border-color);
+  background-color: var(--bg-page);
+  cursor: not-allowed;
+  border-color: var(--placeholder-bg);
 }
