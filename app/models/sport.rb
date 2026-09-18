@@ -8,4 +8,4 @@ class Sport < ApplicationRecord
   end
 end
 
-#comentario de prueba
+# comentario de prueba
