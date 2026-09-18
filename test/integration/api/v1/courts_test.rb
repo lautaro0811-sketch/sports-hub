@@ -1,13 +1,15 @@
 require "test_helper"
 
 class Api::V1::CourtsTest < ActionDispatch::IntegrationTest
+  fixtures []
+
   setup do
-    @user = users(:one)
+    @user = User.create!(name: "Usuario Test", email: "user_api_test@example.com", password: "password123")
 
     @sport = Sport.find_or_create_by!(name: "Fútbol")
     @scheme = PricingScheme.find_or_create_by!(name: "Esquema Test")
-    @complex = SportsComplex.first || SportsComplex.create!(name: "Complejo Test", address: "Calle 123", default_pricing_scheme: @scheme)
-    @court = @complex.courts.first || @complex.courts.create!(name: "Cancha 1", surface_type: "Césped", sport: @sport, base_price: 1000, is_active: true)
+    @complex = SportsComplex.create!(name: "Complejo Test", address: "Calle 123", city: "Buenos Aires", default_pricing_scheme: @scheme)
+    @court = @complex.courts.create!(name: "Cancha 1", surface_type: "Césped", sport: @sport, base_price: 1000, is_active: true)
 
     # Regla: Lunes (1), 18:00 a 20:00 con multiplicador 1.5
     @scheme.pricing_rules.find_or_create_by!(

@@ -25,14 +25,16 @@ class Court < ApplicationRecord
     where(sports_complex_id: complex_id)
   }
 
-  # Filtro por deporte: acepta ID numérico o nombre del deporte (case-insensitive)
+  # Filtro por deporte: acepta ID numérico o nombre del deporte (case-insensitive e insensitive a acentos)
   scope :by_sport, ->(sport_param) {
     return all if sport_param.blank?
 
     if sport_param.to_s.match?(/\A\d+\z/)
       where(sport_id: sport_param)
     else
-      joins(:sport).where("LOWER(sports.name) = LOWER(?)", sport_param.to_s.strip)
+      normalized = sport_param.to_s.strip.tr("áéíóúÁÉÍÓÚ", "aeiouAEIOU")
+      clean_name_sql = "REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(LOWER(sports.name), 'á', 'a'), 'é', 'e'), 'í', 'i'), 'ó', 'o'), 'ú', 'u')"
+      joins(:sport).where("#{clean_name_sql} = LOWER(?)", normalized)
     end
   }
 
@@ -43,8 +45,8 @@ class Court < ApplicationRecord
         SELECT 1 FROM time_slots
         WHERE time_slots.court_id = courts.id
           AND time_slots.day_of_week = :wday
-          AND time_slots.start_time <= :time
-          AND time_slots.end_time > :time
+          AND TIME(time_slots.start_time) <= :time
+          AND TIME(time_slots.end_time) > :time
       )",
       wday: day_of_week,
       time: time_str
@@ -59,8 +61,8 @@ class Court < ApplicationRecord
         WHERE reservations.court_id = courts.id
           AND reservations.reservation_date = :date
           AND reservations.status != :cancelled_status
-          AND reservations.start_time <= :time
-          AND reservations.end_time > :time
+          AND TIME(reservations.start_time) <= :time
+          AND TIME(reservations.end_time) > :time
       )",
       date: date,
       cancelled_status: Reservation.statuses[:cancelled],

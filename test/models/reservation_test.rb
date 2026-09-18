@@ -243,7 +243,8 @@ class ReservationTest < ActiveSupport::TestCase
     assert_includes Reservation.by_status("confirmed"), res2
 
     # Ordenamiento
-    assert_equal [ res2, res1 ], Reservation.ordered_by_date(:desc).to_a
-    assert_equal [ res1, res2 ], Reservation.ordered_by_date(:asc).to_a
+    test_res_ids = [ res1.id, res2.id ]
+    assert_equal [ res2, res1 ], Reservation.where(id: test_res_ids).ordered_by_date(:desc).to_a
+    assert_equal [ res1, res2 ], Reservation.where(id: test_res_ids).ordered_by_date(:asc).to_a
   end
 end
