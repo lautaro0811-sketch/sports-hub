@@ -35,7 +35,9 @@ Rails.application.routes.draw do
         resources :courts, only: %i[index show]
       end
 
-      resources :reservations, only: %i[index show create]
+      resources :courts, only: %i[index show]
+
+      resources :reservations, only: %i[index show create destroy]
     end
   end
 end

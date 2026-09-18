@@ -39,4 +39,19 @@ class ReservationMailerTest < ActionMailer::TestCase
     assert_match "Confirmación de tu reserva", email.subject
     assert_match "Complejo Central", email.body.encoded
   end
+
+  test "envia email de cancelacion de reserva" do
+    @reservation.update!(status: :cancelled)
+    email = ReservationMailer.cancellation_email(@reservation)
+
+    assert_emails 1 do
+      email.deliver_now
+    end
+
+    assert_equal [ "notificaciones@sportshub.com" ], email.from
+    assert_equal [ @user.email ], email.to
+    assert_match "Cancelación de tu reserva", email.subject
+    assert_match "Complejo Central", email.body.encoded
+    assert_match "cancelada", email.body.encoded
+  end
 end

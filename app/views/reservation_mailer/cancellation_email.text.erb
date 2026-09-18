@@ -1,0 +1,12 @@
+¡Hola <%= @user.name %>!
+
+Tu reserva ha sido cancelada exitosamente. Aquí están los detalles:
+
+Complejo: <%= @complex.name %> (<%= @complex.address %>)
+Cancha: <%= @court.name %> (<%= @court.surface_type %>)
+Fecha: <%= @reservation.reservation_date.strftime("%d/%m/%Y") %>
+Horario: <%= @reservation.start_time.strftime("%H:%M") %> a <%= @reservation.end_time.strftime("%H:%M") %> hs
+Monto: $<%= @reservation.total_price %>
+
+La cancha ha sido liberada. ¡Esperamos verte pronto en Sports Hub!
+

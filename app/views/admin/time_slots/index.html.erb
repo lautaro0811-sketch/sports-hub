@@ -1,55 +1,55 @@
-<div class="page-header" style="margin-bottom: 16px;">
+<div class="page-header mb-md">
   <div>
-    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px; flex-wrap: wrap;">
-      <span class="badge badge-secondary" style="font-size: 12px;"><%= @court.sports_complex.name %> &bull; <%= @court.sport.name %></span>
-      <span class="badge badge-secondary" style="font-size: 12px; color: #166534; font-weight: 600;">Precio base: $<%= number_with_precision(@court.base_price, precision: 2) %></span>
+    <div class="header-badges">
+      <span class="badge badge-secondary"><%= @court.sports_complex.name %> &bull; <%= @court.sport.name %></span>
+      <span class="badge badge-secondary badge-price">Precio base: $<%= number_with_precision(@court.base_price, precision: 2) %></span>
       <% if @court.effective_pricing_scheme.present? %>
-        <%= link_to "Tarifas: #{@court.effective_pricing_scheme.name}", admin_pricing_scheme_path(@court.effective_pricing_scheme), class: "badge badge-success", style: "text-decoration: none; font-size: 12px;", title: "Ver tarifas asociadas" %>
+        <%= link_to "Tarifas: #{@court.effective_pricing_scheme.name}", admin_pricing_scheme_path(@court.effective_pricing_scheme), class: "badge badge-success", title: "Ver tarifas asociadas" %>
       <% end %>
     </div>
     <h1 class="page-title">Disponibilidad Semanal y Turnos: <%= @court.name %></h1>
-    <p style="margin: 4px 0 0 0; color: var(--text-muted); font-size: 14px;">
+    <p class="page-subtitle">
       Definí los días y horarios en los que la cancha estará abierta y disponible para reservas.
     </p>
   </div>
-  <div style="display: flex; gap: 10px; align-items: center;">
+  <div class="header-actions">
     <%= link_to "Volver a Canchas", admin_courts_path, class: "btn btn-secondary" %>
   </div>
 </div>
 
 <!-- BANNER COMPACTO DE AYUDA CONTEXTUAL -->
-<div style="background: #f8fafc; border: 1px solid var(--border-color); border-left: 4px solid var(--primary-color); border-radius: var(--radius-md); padding: 12px 16px; margin-bottom: 22px; display: flex; align-items: center; gap: 12px;">
-  <span style="font-size: 1.25rem; line-height: 1;">💡</span>
-  <div style="font-size: 13.5px; color: var(--text-main); line-height: 1.4;">
+<div class="banner-info">
+  <span class="banner-info-icon">💡</span>
+  <div class="banner-info-content">
     <strong>Configurá la disponibilidad de esta cancha:</strong>
-    <span style="color: var(--text-muted);">
+    <span class="text-muted">
       Elegí los días, el horario de apertura y cierre y la duración de cada turno. Los horarios generados estarán disponibles para que los clientes puedan reservar.
     </span>
   </div>
 </div>
 
 <!-- GENERADOR RÁPIDO DE TURNOS Y DISPONIBILIDAD -->
-<div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 22px; margin-bottom: 28px; box-shadow: var(--shadow-sm);">
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
+<div class="content-card">
+  <div class="section-header">
     <div>
-      <h2 style="margin: 0; font-size: 1.2rem; color: var(--text-main);">Habilitar Turnos de Reserva</h2>
-      <p style="margin: 4px 0 0 0; color: var(--text-muted); font-size: 13px;">
+      <h2 class="section-heading">Habilitar Turnos de Reserva</h2>
+      <p class="card-section-desc mb-0">
         Generá la disponibilidad para los días seleccionados indicando la franja horaria y la duración de cada turno.
       </p>
     </div>
-    <div style="font-size: 13px; color: var(--text-muted);">
-      Total configurado: <strong style="color: var(--text-main); font-size: 14px;"><%= @time_slots.count %></strong> turno(s) activos
+    <div class="section-counter">
+      Total configurado: <strong class="font-bold"><%= @time_slots.count %></strong> turno(s) activos
     </div>
   </div>
 
   <%= form_with(url: admin_court_time_slots_path(@court), method: :post, local: true) do |f| %>
     <!-- Selección de Días -->
-    <div style="margin-bottom: 18px;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
-        <label class="form-label" style="margin: 0; font-size: 14px;">1. Elegí los días disponibles:</label>
+    <div class="form-group">
+      <div class="day-selection-header">
+        <label class="form-label mb-0">1. Elegí los días disponibles:</label>
         
         <!-- Atajos de selección con 1 clic -->
-        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+        <div class="btn-group-wrap mb-0">
           <button type="button" class="btn btn-sm btn-secondary" onclick="selectDays([1,2,3,4,5])">Lunes a Viernes</button>
           <button type="button" class="btn btn-sm btn-secondary" onclick="selectDays([6,0])">Fin de Semana</button>
           <button type="button" class="btn btn-sm btn-secondary" onclick="selectDays([1,2,3,4,5,6,0])">Toda la semana</button>
@@ -58,12 +58,12 @@
       </div>
 
       <!-- Pastillas de días -->
-      <div style="display: flex; gap: 10px; flex-wrap: wrap; background: #f8fafc; padding: 10px 14px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+      <div class="pill-group-container">
         <% [
           ['Lunes', 1], ['Martes', 2], ['Miércoles', 3], 
           ['Jueves', 4], ['Viernes', 5], ['Sábado', 6], ['Domingo', 0]
         ].each do |nombre, dia_val| %>
-          <label class="day-pill" id="pill_<%= dia_val %>" style="display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: var(--radius-pill); border: 1px solid var(--border-color); background: #ffffff; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.15s ease; user-select: none;">
+          <label class="day-pill" id="pill_<%= dia_val %>">
             <%= check_box_tag "days_of_week[]", dia_val, false, id: "day_#{dia_val}", class: "slot-day-checkbox", onchange: "updatePillStyle(this)" %>
             <span><%= nombre %></span>
           </label>
@@ -72,19 +72,19 @@
     </div>
 
     <!-- Rango de Horarios, Duración de Intervalo y Botón -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; align-items: flex-end;">
+    <div class="form-grid-slots">
       <div>
-        <label class="form-label" style="font-size: 14px;">2. Horario de apertura (desde):</label>
-        <%= f.time_field :start_time, value: "14:00", required: true, class: "form-input", style: "font-weight: 600;" %>
+        <label class="form-label">2. Horario de apertura (desde):</label>
+        <%= f.time_field :start_time, value: "14:00", required: true, class: "form-input font-bold" %>
       </div>
 
       <div>
-        <label class="form-label" style="font-size: 14px;">3. Horario de cierre (hasta):</label>
-        <%= f.time_field :end_time, value: "23:00", required: true, class: "form-input", style: "font-weight: 600;" %>
+        <label class="form-label">3. Horario de cierre (hasta):</label>
+        <%= f.time_field :end_time, value: "23:00", required: true, class: "form-input font-bold" %>
       </div>
 
       <div>
-        <label class="form-label" style="font-size: 14px;">4. Duración de cada turno:</label>
+        <label class="form-label">4. Duración de cada turno:</label>
         <%= f.select :slot_duration, [
           ['60 minutos (1 hora)', '60'],
           ['90 minutos (1h 30m)', '90'],
@@ -95,30 +95,30 @@
       </div>
 
       <div>
-        <%= f.submit "Generar Turnos", class: "btn btn-primary btn-block", style: "font-weight: 600; padding: 10px 16px;" %>
+        <%= f.submit "Generar Turnos", class: "btn btn-primary btn-block" %>
       </div>
     </div>
   <% end %>
 </div>
 
 <!-- VISUALIZACIÓN DE LA GRILLA DE TURNOS SEMANALES -->
-<div style="margin-bottom: 40px;">
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
+<div class="section-container">
+  <div class="section-header">
     <div>
-      <h2 style="margin: 0; font-size: 1.25rem; color: var(--text-main);">Cronograma Semanal de Disponibilidad</h2>
-      <p style="margin: 2px 0 0 0; font-size: 13px; color: var(--text-muted);">
+      <h2 class="section-heading">Cronograma Semanal de Disponibilidad</h2>
+      <p class="card-section-desc mb-0">
         Revisá los turnos habilitados para cada día de la semana con su precio de reserva correspondiente.
       </p>
     </div>
 
     <!-- Controles de vista y vaciado -->
-    <div style="display: flex; gap: 10px; align-items: center;">
+    <div class="view-controls">
       <!-- Toggle de vistas -->
-      <div style="display: inline-flex; border: 1px solid var(--border-color); border-radius: var(--radius-md); overflow: hidden; background: #ffffff;">
-        <button type="button" id="btn-view-cards" class="btn btn-sm" style="background: var(--neutral-bg); font-weight: 600; border-radius: 0; border: none;" onclick="switchView('cards')">
+      <div class="view-toggle-group">
+        <button type="button" id="btn-view-cards" class="view-toggle-btn active" onclick="switchView('cards')">
           Vista Semanal
         </button>
-        <button type="button" id="btn-view-table" class="btn btn-sm" style="background: transparent; color: var(--text-muted); border-radius: 0; border: none;" onclick="switchView('table')">
+        <button type="button" id="btn-view-table" class="view-toggle-btn" onclick="switchView('table')">
           Vista Tabla
         </button>
       </div>
@@ -130,46 +130,46 @@
   </div>
 
   <!-- A. VISTA SEMANAL EN COLUMNAS / TARJETAS POR DÍA (DEFAULT) -->
-  <div id="view-cards-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;">
+  <div id="view-cards-container" class="slot-cards-grid">
     <% TimeSlot::DAY_ORDER.each do |dia_val| %>
       <% 
         dia_nombre = TimeSlot::DAYS[dia_val]
         day_slots = @slots_by_day[dia_val] || []
       %>
-      <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); display: flex; flex-direction: column;">
+      <div class="slot-day-card">
         <!-- Cabecera del día -->
-        <div style="background: <%= day_slots.any? ? 'var(--table-header-bg)' : '#f8fafc' %>; padding: 12px 16px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+        <div class="slot-day-header <%= 'has-slots' if day_slots.any? %>">
           <div>
-            <strong style="font-size: 15px; color: var(--text-main);"><%= dia_nombre %></strong>
-            <span class="badge <%= day_slots.any? ? 'badge-primary' : 'badge-secondary' %>" style="font-size: 11px; margin-left: 6px;">
+            <strong class="slot-day-title"><%= dia_nombre %></strong>
+            <span class="badge badge-sm <%= day_slots.any? ? 'badge-primary' : 'badge-secondary' %>">
               <%= day_slots.size %> turno<%= 's' unless day_slots.size == 1 %>
             </span>
           </div>
 
           <% if day_slots.any? %>
-            <%= button_to "Vaciar día", destroy_day_admin_court_time_slots_path(@court, day_of_week: dia_val), method: :delete, data: { turbo_confirm: "¿Eliminar todos los turnos del día #{dia_nombre}?" }, class: "btn btn-sm", style: "background: transparent; color: var(--danger-color); padding: 2px 6px; font-size: 11px; border: 1px solid var(--danger-border); border-radius: var(--radius-sm);" %>
+            <%= button_to "Vaciar día", destroy_day_admin_court_time_slots_path(@court, day_of_week: dia_val), method: :delete, data: { turbo_confirm: "¿Eliminar todos los turnos del día #{dia_nombre}?" }, class: "btn btn-xs btn-outline-danger" %>
           <% end %>
         </div>
 
         <!-- Contenido / Lista de turnos del día -->
-        <div style="padding: 12px; flex: 1; display: flex; flex-direction: column; gap: 8px;">
+        <div class="slot-list">
           <% if day_slots.any? %>
             <% day_slots.each do |slot| %>
               <% 
                 mult = slot.effective_multiplier
                 price = slot.calculated_price
               %>
-              <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: var(--radius-md); padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; transition: background 0.15s ease;">
+              <div class="slot-item">
                 <div>
-                  <div style="font-weight: 700; font-size: 14px; color: var(--text-main); letter-spacing: -0.2px;">
+                  <div class="slot-time">
                     <%= slot.formatted_time_range %>
                   </div>
-                  <div style="display: flex; align-items: center; gap: 6px; margin-top: 3px; font-size: 12px;">
-                    <span style="color: var(--text-muted);"><%= slot.duration_in_hours %>h</span>
-                    <span style="color: #cbd5e1;">&bull;</span>
-                    <strong style="color: #166534;">$<%= number_with_precision(price, precision: 2) %></strong>
+                  <div class="slot-meta">
+                    <span class="text-muted"><%= slot.duration_in_hours %>h</span>
+                    <span class="text-separator">&bull;</span>
+                    <strong class="price-highlight">$<%= number_with_precision(price, precision: 2) %></strong>
                     <% if mult != 1.0 %>
-                      <span class="badge <%= mult > 1.0 ? 'badge-success' : 'badge-warning' %>" style="font-size: 10px; padding: 1px 5px;" title="Tarifa ajustada para este horario">
+                      <span class="badge badge-xs <%= mult > 1.0 ? 'badge-success' : 'badge-warning' %>" title="Tarifa ajustada para este horario">
                         x<%= mult %>
                       </span>
                     <% end %>
@@ -177,14 +177,14 @@
                 </div>
 
                 <div>
-                  <%= button_to "×", admin_court_time_slot_path(@court, slot), method: :delete, data: { turbo_confirm: "¿Eliminar el turno #{slot.formatted_time_range} del #{dia_nombre}?" }, class: "btn btn-sm", style: "background: transparent; color: var(--text-muted); font-size: 18px; line-height: 1; padding: 2px 6px; border: none; cursor: pointer;", title: "Eliminar turno" %>
+                  <%= button_to "×", admin_court_time_slot_path(@court, slot), method: :delete, data: { turbo_confirm: "¿Eliminar el turno #{slot.formatted_time_range} del #{dia_nombre}?" }, class: "btn-icon-delete", title: "Eliminar turno" %>
                 </div>
               </div>
             <% end %>
           <% else %>
-            <div style="padding: 24px 12px; text-align: center; color: var(--text-muted); font-size: 13px; font-style: italic;">
+            <div class="slot-day-empty">
               Sin turnos habilitados<br>
-              <span style="font-size: 11px; color: #94a3b8;">(Cerrado este día)</span>
+              <span class="slot-closed-note">(Cerrado este día)</span>
             </div>
           <% end %>
         </div>
@@ -193,8 +193,8 @@
   </div>
 
   <!-- B. VISTA TABLA COMPLETA (OPCIONAL) -->
-  <div id="view-table-container" style="display: none; background: #ffffff; border-radius: var(--radius-lg); border: 1px solid var(--border-color); overflow: hidden; box-shadow: var(--shadow-sm);">
-    <table class="admin-table" style="margin-bottom: 0;">
+  <div id="view-table-container" class="slot-table-wrapper is-hidden">
+    <table class="admin-table mb-0">
       <thead>
         <tr>
           <th>Día</th>
@@ -214,7 +214,7 @@
             %>
             <tr>
               <td><strong><%= slot.day_name %></strong></td>
-              <td><strong style="font-size: 14px;"><%= slot.formatted_time_range %></strong></td>
+              <td><strong class="font-bold"><%= slot.formatted_time_range %></strong></td>
               <td><%= slot.duration_in_hours %> h</td>
               <td>
                 <% if mult != 1.0 %>
@@ -226,7 +226,7 @@
                 <% end %>
               </td>
               <td>
-                <strong style="color: #166534;">$<%= number_with_precision(price, precision: 2) %></strong>
+                <strong class="price-highlight">$<%= number_with_precision(price, precision: 2) %></strong>
               </td>
               <td>
                 <div class="table-actions text-right">
@@ -244,18 +244,6 @@
     </table>
   </div>
 </div>
-
-<style>
-  .day-pill-active {
-    background-color: var(--primary-color) !important;
-    border-color: var(--primary-color) !important;
-    color: #ffffff !important;
-    font-weight: 600 !important;
-  }
-  .day-pill-active span {
-    color: #ffffff !important;
-  }
-</style>
 
 <script>
   function selectDays(daysArray) {
@@ -284,23 +272,15 @@
     var btnTable = document.getElementById('btn-view-table');
 
     if (mode === 'table') {
-      cardsView.style.display = 'none';
-      tableView.style.display = 'block';
-      btnTable.style.background = 'var(--neutral-bg)';
-      btnTable.style.fontWeight = '600';
-      btnTable.style.color = 'var(--text-main)';
-      btnCards.style.background = 'transparent';
-      btnCards.style.fontWeight = 'normal';
-      btnCards.style.color = 'var(--text-muted)';
+      cardsView.classList.add('is-hidden');
+      tableView.classList.remove('is-hidden');
+      btnTable.classList.add('active');
+      btnCards.classList.remove('active');
     } else {
-      cardsView.style.display = 'grid';
-      tableView.style.display = 'none';
-      btnCards.style.background = 'var(--neutral-bg)';
-      btnCards.style.fontWeight = '600';
-      btnCards.style.color = 'var(--text-main)';
-      btnTable.style.background = 'transparent';
-      btnTable.style.fontWeight = 'normal';
-      btnTable.style.color = 'var(--text-muted)';
+      cardsView.classList.remove('is-hidden');
+      tableView.classList.add('is-hidden');
+      btnCards.classList.add('active');
+      btnTable.classList.remove('active');
     }
   }
 
