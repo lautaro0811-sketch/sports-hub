@@ -8,7 +8,7 @@ module Admin
 
       courts_scope = Court.includes(:sports_complex, :sport, :pricing_scheme)
                           .search_by_name(params[:name])
-                          .by_sports_complex(params[:sports_complex_id])
+                          .by_sports_complex(params[:sports_complex_id].presence || params[:complex_id].presence)
                           .by_sport(params[:sport_id])
                           .order(:name)
 

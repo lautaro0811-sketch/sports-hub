@@ -5,6 +5,19 @@ class SportsComplex < ApplicationRecord
 
   validates :name, :address, :city, presence: true
 
+  # Scopes de filtrado para administración y búsquedas
+  scope :search_by_name, ->(query) {
+    return all if query.blank?
+
+    where("LOWER(sports_complexes.name) LIKE LOWER(?)", "%#{sanitize_sql_like(query.to_s.strip)}%")
+  }
+
+  scope :by_city, ->(city) {
+    return all if city.blank?
+
+    where(city: city)
+  }
+
   def total_courts
     courts.count
   end

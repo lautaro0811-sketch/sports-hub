@@ -3,7 +3,14 @@ module Admin
     before_action :set_sports_complex, only: [ :edit, :update, :destroy ]
 
     def index
-      @sports_complexes = SportsComplex.includes(:default_pricing_scheme, :courts).all
+      @cities = SportsComplex.distinct.pluck(:city).compact_blank.sort
+
+      sports_complexes_scope = SportsComplex.includes(:default_pricing_scheme, :courts)
+                                            .search_by_name(params[:name])
+                                            .by_city(params[:city])
+                                            .order(:name)
+
+      @pagy, @sports_complexes = pagy(sports_complexes_scope, limit: 10)
     end
 
     def new
