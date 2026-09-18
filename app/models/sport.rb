@@ -7,3 +7,5 @@ class Sport < ApplicationRecord
     courts.count
   end
 end
+
+#comentario de prueba
