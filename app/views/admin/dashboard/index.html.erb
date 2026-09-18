@@ -1,0 +1,238 @@
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Dashboard Operativo</h1>
+    <p class="page-subtitle">
+      <%= Date.current.strftime("%A %d de %B, %Y").capitalize %>
+    </p>
+  </div>
+
+  <%# ── Filtro Multi-complejo ── %>
+  <%= form_with url: admin_root_path, method: :get, data: { turbo_frame: "dashboard_content" } do |f| %>
+    <div style="display: flex; align-items: center; gap: 0.5rem;">
+      <%= f.label :complex_id, "Complejo:", style: "font-weight: 600; white-space: nowrap; margin-bottom: 0;" %>
+      <%= f.select :complex_id,
+          options_for_select(
+            [["Todos los complejos", ""]] + @sports_complexes.map { |sc| [sc.name, sc.id] },
+            @selected_complex_id
+          ),
+          {},
+          class: "form-control",
+          style: "min-width: 220px; padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border-color, #ccc);",
+          onchange: "this.form.requestSubmit()" %>
+      <noscript>
+        <%= f.submit "Filtrar", class: "btn-primary", style: "padding: 6px 12px; border-radius: 6px;" %>
+      </noscript>
+    </div>
+  <% end %>
+</div>
+
+<%= turbo_frame_tag "dashboard_content" do %>
+  <%# Auto-refresh cada 60 segundos nativo dentro del frame %>
+  <meta http-equiv="refresh" content="60">
+
+  <%# ── KPI Cards ── %>
+  <div class="dashboard-kpi-grid">
+    <%# Reservas Hoy %>
+    <div class="dashboard-kpi-card">
+      <div class="dashboard-kpi-icon dashboard-kpi-icon--primary">
+        🗓️
+      </div>
+      <div class="dashboard-kpi-body">
+        <span class="dashboard-kpi-value"><%= @today_reservations_total %></span>
+        <span class="dashboard-kpi-label">Reservas Hoy</span>
+        <span class="dashboard-kpi-subtitle"><%= @today_reservations_finished %> finalizadas</span>
+      </div>
+    </div>
+
+    <%# Canchas en Uso %>
+    <div class="dashboard-kpi-card">
+      <div class="dashboard-kpi-icon dashboard-kpi-icon--success">
+        🏟️
+      </div>
+      <div class="dashboard-kpi-body">
+        <span class="dashboard-kpi-value"><%= @current_active_courts %></span>
+        <span class="dashboard-kpi-label">Canchas en Uso</span>
+        <span class="dashboard-kpi-subtitle">de <%= @total_courts %> activas</span>
+      </div>
+    </div>
+
+    <%# Turnos Restantes %>
+    <div class="dashboard-kpi-card">
+      <div class="dashboard-kpi-icon dashboard-kpi-icon--info">
+        ⏳
+      </div>
+      <div class="dashboard-kpi-body">
+        <span class="dashboard-kpi-value"><%= @today_remaining_shifts %></span>
+        <span class="dashboard-kpi-label">Turnos Restantes</span>
+        <span class="dashboard-kpi-subtitle">para el resto del día</span>
+      </div>
+    </div>
+
+    <%# Cancelaciones Hoy %>
+    <div class="dashboard-kpi-card">
+      <div class="dashboard-kpi-icon dashboard-kpi-icon--danger">
+        ❌
+      </div>
+      <div class="dashboard-kpi-body">
+        <span class="dashboard-kpi-value"><%= @today_cancellations %></span>
+        <span class="dashboard-kpi-label">Cancelaciones Hoy</span>
+        <span class="dashboard-kpi-subtitle">reservas canceladas</span>
+      </div>
+    </div>
+  </div>
+
+  <%# ── Ahora Mismo ── %>
+  <div class="dashboard-section dashboard-section--now">
+    <h2 class="dashboard-section-title">🔴 Ahora Mismo</h2>
+
+    <% if @current_reservations.any? %>
+      <div class="dashboard-now-grid">
+        <% @current_reservations.each do |reservation| %>
+          <div class="dashboard-now-card">
+            <div class="dashboard-now-card__header">
+              <span class="dashboard-now-card__court"><%= reservation.court.name %></span>
+              <span class="dashboard-now-card__sport"><%= reservation.court.sport.name %></span>
+            </div>
+            <div class="dashboard-now-card__time">
+              <%= reservation.start_time.strftime("%H:%M") %> - <%= reservation.end_time.strftime("%H:%M") %> hs
+            </div>
+            <div class="dashboard-now-card__client">
+              <strong><%= reservation.user.name %></strong>
+              <% if reservation.user.phone.present? %>
+                <span class="dashboard-now-card__phone"><%= reservation.user.phone %></span>
+              <% end %>
+            </div>
+            <div class="dashboard-now-card__status">
+              <span class="badge badge-live">En juego</span>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="dashboard-empty-message">No hay turnos en curso.</p>
+    <% end %>
+  </div>
+
+  <%# ── Próximo Turno (destacado) ── %>
+  <div class="dashboard-section dashboard-section--next-shift">
+    <h2 class="dashboard-section-title">⏭️ Próximo Turno</h2>
+
+    <% if @next_shift %>
+      <div class="dashboard-next-shift">
+        <div class="dashboard-next-shift__info">
+          <div class="dashboard-next-shift__court">
+            <%= @next_shift.court.name %>
+            <span class="dashboard-next-shift__sport"><%= @next_shift.court.sport.name %></span>
+          </div>
+          <div class="dashboard-next-shift__time">
+            <%= @next_shift.start_time.strftime("%H:%M") %> - <%= @next_shift.end_time.strftime("%H:%M") %> hs
+          </div>
+          <div class="dashboard-next-shift__client">
+            <strong><%= @next_shift.user.name %></strong>
+            <% if @next_shift.user.phone.present? %>
+              <span class="dashboard-next-shift__phone"><%= @next_shift.user.phone %></span>
+            <% end %>
+          </div>
+        </div>
+        <div class="dashboard-next-shift__countdown">
+          <span class="dashboard-next-shift__countdown-value"><%= @minutes_until_next %></span>
+          <span class="dashboard-next-shift__countdown-label">
+            <%= @minutes_until_next == 1 ? "minuto" : "minutos" %>
+          </span>
+        </div>
+      </div>
+    <% else %>
+      <p class="dashboard-empty-message">No hay más turnos programados para hoy.</p>
+    <% end %>
+  </div>
+
+  <%# ── Estado de Canchas ── %>
+  <div class="dashboard-section">
+    <h2 class="dashboard-section-title">🏟️ Estado de Canchas</h2>
+
+    <div class="dashboard-courts-grid">
+      <% @court_statuses.each do |cs| %>
+        <div class="dashboard-court-status dashboard-court-status--<%= cs.status %>">
+          <div class="dashboard-court-status__header">
+            <span class="dashboard-court-status__name"><%= cs.court.name %></span>
+            <span class="dashboard-court-status__sport"><%= cs.court.sport.name %></span>
+          </div>
+          <div class="dashboard-court-status__badge">
+            <% case cs.status %>
+            <% when :in_use %>
+              <span class="badge badge-live">En juego</span>
+            <% when :upcoming %>
+              <span class="badge badge-warning">Próximo turno</span>
+            <% when :available %>
+              <span class="badge badge-available">Disponible</span>
+            <% end %>
+          </div>
+          <% if cs.status == :upcoming && cs.next_reservation %>
+            <div class="dashboard-court-status__detail">
+              <%= cs.next_reservation.start_time.strftime("%H:%M") %> hs — <%= cs.next_reservation.user.name %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <%# ── Próximos Turnos (tabla) ── %>
+  <div class="dashboard-section">
+    <h2 class="dashboard-section-title">📋 Próximos Turnos</h2>
+
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Horario</th>
+          <th>Cliente</th>
+          <th>Cancha</th>
+          <th>Complejo</th>
+          <th>Estado</th>
+          <th>Pago</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if @upcoming_shifts.any? %>
+          <% @upcoming_shifts.each do |reservation| %>
+            <tr>
+              <td>
+                <strong><%= reservation.start_time.strftime("%H:%M") %> - <%= reservation.end_time.strftime("%H:%M") %> hs</strong>
+              </td>
+              <td>
+                <strong><%= reservation.user.name %></strong>
+                <span class="table-subtext"><%= reservation.user.phone %></span>
+              </td>
+              <td>
+                <%= reservation.court.name %>
+                <span class="table-subtext"><%= reservation.court.sport.name %></span>
+              </td>
+              <td><%= reservation.court.sports_complex.name %></td>
+              <td>
+                <% case reservation.status %>
+                <% when "confirmed" %>
+                  <span class="badge badge-success">Confirmada</span>
+                <% when "pending" %>
+                  <span class="badge badge-warning">Pendiente</span>
+                <% end %>
+              </td>
+              <td>
+                <% if reservation.paid? %>
+                  <span class="badge badge-success">✓ Pagado</span>
+                <% else %>
+                  <span class="badge badge-warning">⚠ Pendiente</span>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        <% else %>
+          <tr>
+            <td colspan="6" class="table-empty">
+              No hay turnos pendientes para el resto del día.
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% end %>

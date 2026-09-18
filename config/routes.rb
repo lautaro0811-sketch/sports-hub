@@ -8,7 +8,7 @@ Rails.application.routes.draw do
   delete "logout", to: "sessions#destroy", as: :logout
 
   namespace :admin do
-    root to: "sports_complexes#index"
+    root to: "dashboard#index"
     resources :sports_complexes
     resources :pricing_schemes do
       member do

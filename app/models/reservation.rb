@@ -3,6 +3,7 @@ class Reservation < ApplicationRecord
   belongs_to :user
 
   enum :status, { pending: 0, confirmed: 1, cancelled: 2 }, default: :pending
+  enum :payment_status, { unpaid: 0, paid: 1 }, default: :unpaid
 
   scope :by_sports_complex, ->(complex_id) {
     joins(:court).where(courts: { sports_complex_id: complex_id }) if complex_id.present?
