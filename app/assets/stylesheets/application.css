@@ -213,6 +213,15 @@ select.form-input {
   background-color: var(--danger-hover);
 }
 
+.btn-info {
+  background-color: var(--info-color, #0284c7);
+  color: var(--text-inverse);
+}
+
+.btn-info:hover {
+  background-color: var(--info-hover, #0369a1);
+}
+
 .btn-outline-danger {
   background: transparent;
   color: var(--danger-color);

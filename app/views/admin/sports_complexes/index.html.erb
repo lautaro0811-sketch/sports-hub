@@ -1,6 +1,43 @@
 <div class="page-header">
-  <h1 class="page-title">Complejos Deportivos</h1>
+  <div>
+    <h1 class="page-title">Complejos Deportivos</h1>
+    <p class="page-subtitle">
+      Administración y gestión de complejos deportivos y sus esquemas tarifarios.
+    </p>
+  </div>
   <%= link_to "Nuevo Complejo", new_admin_sports_complex_path, class: "btn btn-primary" %>
+</div>
+
+<div class="filter-card">
+  <%= form_with url: admin_sports_complexes_path, method: :get, local: true, class: "filter-form" do |f| %>
+    <!-- Búsqueda por Texto (Nombre del complejo) -->
+    <div class="filter-group filter-group-main">
+      <%= f.label :name, "Buscar por nombre", class: "visually-hidden" %>
+      <%= f.text_field :name,
+                       value: params[:name],
+                       placeholder: "Buscar por nombre de complejo...",
+                       class: "form-input",
+                       "aria-label": "Buscar por nombre del complejo" %>
+    </div>
+
+    <!-- Filtro por Ciudad -->
+    <div class="filter-group">
+      <%= f.label :city, "Ciudad", class: "visually-hidden" %>
+      <%= f.select :city,
+                   options_for_select(@cities, params[:city]),
+                   { include_blank: "Todas las ciudades" },
+                   class: "form-input",
+                   "aria-label": "Filtrar por ciudad" %>
+    </div>
+
+    <!-- Botones de Acción -->
+    <div class="filter-actions">
+      <%= f.submit "Buscar", class: "btn btn-primary" %>
+      <% if params[:name].present? || params[:city].present? %>
+        <%= link_to "Limpiar Filtros", admin_sports_complexes_path, class: "btn btn-secondary", title: "Restablecer filtros" %>
+      <% end %>
+    </div>
+  <% end %>
 </div>
 
 <table class="admin-table">
@@ -33,7 +70,7 @@
           <td><%= complex.address %></td>
           <td><%= complex.city %></td>
           <td><%= complex.phone %></td>
-          <td><%= complex.courts.count %></td>
+          <td><%= complex.courts.size %></td>
           <td>
             <% if complex.default_pricing_scheme.present? %>
               <%= link_to complex.default_pricing_scheme.name, admin_pricing_scheme_path(complex.default_pricing_scheme), class: "badge badge-success" %>
@@ -43,6 +80,7 @@
           </td>
           <td>
             <div class="table-actions">
+              <%= link_to "Canchas", admin_courts_path(sports_complex_id: complex.id), class: "btn btn-sm btn-info", title: "Ver canchas de este complejo" %>
               <%= link_to "Editar", edit_admin_sports_complex_path(complex), class: "btn btn-sm btn-secondary" %>
               <%= button_to "Eliminar", admin_sports_complex_path(complex), method: :delete, data: { turbo_confirm: "¿Seguro que querés eliminar este complejo?" }, class: "btn btn-sm btn-danger" %>
             </div>
@@ -52,9 +90,24 @@
     <% else %>
       <tr>
         <td colspan="8" class="table-empty">
-          No hay complejos registrados todavía.
+          <% if params[:name].present? || params[:city].present? %>
+            No se encontraron complejos que coincidan con los criterios de búsqueda.
+          <% else %>
+            No hay complejos registrados todavía.
+          <% end %>
         </td>
       </tr>
     <% end %>
   </tbody>
 </table>
+
+<% if defined?(@pagy) && @pagy && @pagy.pages > 1 %>
+  <div class="pagination-container">
+    <div class="pagination-info">
+      Mostrando <strong><%= @pagy.from %></strong> - <strong><%= @pagy.to %></strong> de <strong><%= @pagy.count %></strong> complejos
+    </div>
+    <div class="pagination-links">
+      <%== pagy_nav(@pagy) %>
+    </div>
+  </div>
+<% end %>
