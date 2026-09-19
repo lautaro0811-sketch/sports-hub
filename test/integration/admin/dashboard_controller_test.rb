@@ -49,6 +49,11 @@ class Admin::DashboardControllerTest < ActionDispatch::IntegrationTest
 
     post login_path, params: { email: @admin.email, password: "password123" }
     follow_redirect!
+    travel_to Time.zone.local(2026, 9, 18, 14, 0, 0)
+  end
+
+  teardown do
+    travel_back
   end
 
   # ── Acceso ──
@@ -367,4 +372,3 @@ class Admin::DashboardControllerTest < ActionDispatch::IntegrationTest
     )
   end
 end
-

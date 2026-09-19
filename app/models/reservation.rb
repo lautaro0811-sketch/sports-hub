@@ -18,6 +18,30 @@ class Reservation < ApplicationRecord
     order(reservation_date: dir, start_time: dir)
   }
 
+  scope :for_date, ->(date) {
+    where(reservation_date: date) if date.present?
+  }
+
+  scope :not_cancelled, -> {
+    where.not(status: :cancelled)
+  }
+
+  scope :in_progress_at, ->(time_str) {
+    where(
+      "strftime('%H:%M:%S', reservations.start_time) <= ? AND strftime('%H:%M:%S', reservations.end_time) > ?",
+      time_str,
+      time_str
+    )
+  }
+
+  scope :after_time, ->(time_str) {
+    where("strftime('%H:%M:%S', reservations.start_time) > ?", time_str)
+  }
+
+  scope :finished_before, ->(time_str) {
+    where("strftime('%H:%M:%S', reservations.end_time) <= ?", time_str)
+  }
+
   validates :reservation_date, :start_time, :end_time, :total_price, presence: true
   validate :reservation_date_cannot_be_in_the_past
   validate :no_overlapping_reservations

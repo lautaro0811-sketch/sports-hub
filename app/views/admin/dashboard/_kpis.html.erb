@@ -1,0 +1,54 @@
+<%# ── KPI Cards ── %>
+<div class="dashboard-kpi-grid">
+  <%# Reservas Hoy %>
+  <div class="dashboard-kpi-card">
+    <div class="dashboard-kpi-icon dashboard-kpi-icon--primary">
+      <%= dashboard_icon(:calendar, classes: "kpi-svg") %>
+    </div>
+    <div class="dashboard-kpi-body">
+      <span class="dashboard-kpi-value"><%= @today_reservations_total %></span>
+      <span class="dashboard-kpi-label">Reservas Hoy</span>
+      <span class="dashboard-kpi-subtitle"><%= @today_reservations_finished %> <%= t("dashboard.kpis.finished", default: "finalizadas") %></span>
+    </div>
+  </div>
+
+  <%# Canchas en Uso %>
+  <div class="dashboard-kpi-card">
+    <div class="dashboard-kpi-icon dashboard-kpi-icon--success">
+      <%= dashboard_icon(:court, classes: "kpi-svg") %>
+    </div>
+    <div class="dashboard-kpi-body">
+      <span class="dashboard-kpi-value">
+        <%= @current_active_courts %>
+        <span class="dashboard-kpi-value-total">/ <%= @total_courts %></span>
+      </span>
+      <span class="dashboard-kpi-label">Canchas en Uso</span>
+      <span class="dashboard-kpi-subtitle">Canchas ocupadas actualmente</span>
+    </div>
+  </div>
+
+  <%# Turnos Restantes %>
+  <div class="dashboard-kpi-card">
+    <div class="dashboard-kpi-icon dashboard-kpi-icon--info">
+      <%= dashboard_icon(:clock, classes: "kpi-svg") %>
+    </div>
+    <div class="dashboard-kpi-body">
+      <span class="dashboard-kpi-value"><%= @today_remaining_shifts %></span>
+      <span class="dashboard-kpi-label">Turnos Restantes</span>
+      <span class="dashboard-kpi-subtitle">Reservas por disputar hoy</span>
+    </div>
+  </div>
+
+  <%# Cancelaciones Hoy %>
+  <div class="dashboard-kpi-card">
+    <div class="dashboard-kpi-icon dashboard-kpi-icon--danger">
+      <%= dashboard_icon(:cancelled, classes: "kpi-svg") %>
+    </div>
+    <div class="dashboard-kpi-body">
+      <span class="dashboard-kpi-value"><%= @today_cancellations %></span>
+      <span class="dashboard-kpi-label">Cancelaciones Hoy</span>
+      <span class="dashboard-kpi-subtitle"><%= t("dashboard.kpis.cancellations_sub", default: "reservas canceladas") %></span>
+    </div>
+  </div>
+</div>
+

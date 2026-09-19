@@ -8,66 +8,44 @@ module Admin
 
       @sports_complexes = SportsComplex.order(:name)
       @selected_complex_id = params[:complex_id].presence
+      @selected_complex = @sports_complexes.find { |sc| sc.id.to_s == @selected_complex_id.to_s } if @selected_complex_id
 
       base = base_reservations_scope
+      today_scope = base.for_date(today).not_cancelled
 
       # ── KPI Cards ──
-
-      # Reservas de hoy (no canceladas)
-      today_scope = base.where(reservation_date: today).where.not(status: :cancelled)
       @today_reservations_total = today_scope.count
-      @today_reservations_finished = today_scope
-        .where("strftime('%H:%M:%S', reservations.end_time) <= ?", now_time).count
+      @today_reservations_finished = today_scope.finished_before(now_time).count
+      @today_remaining_shifts = today_scope.after_time(now_time).count
 
-      # Turnos restantes hoy
-      @today_remaining_shifts = today_scope
-        .where("strftime('%H:%M:%S', reservations.start_time) > ?", now_time).count
-
-      # Canchas activas en este momento
-      @current_active_courts = base
-        .where(reservation_date: today)
-        .where.not(status: :cancelled)
-        .where("strftime('%H:%M:%S', reservations.start_time) <= ? AND strftime('%H:%M:%S', reservations.end_time) > ?", now_time, now_time)
-        .distinct
-        .count(:court_id)
-
+      # Canchas activas en este momento (obtenidas en 1 query reutilizable)
+      current_court_ids = today_scope.in_progress_at(now_time).pluck(:court_id)
+      @current_active_courts = current_court_ids.uniq.size
       @total_courts = Court.where(is_active: true).by_sports_complex(@selected_complex_id).count
 
       # Cancelaciones de hoy
-      @today_cancellations = base
-        .where(reservation_date: today, status: :cancelled)
-        .count
+      @today_cancellations = base.for_date(today).where(status: :cancelled).count
 
       # ── Sección "Ahora Mismo": reservas en curso ──
-      @current_reservations = base
+      @current_reservations = today_scope
+        .in_progress_at(now_time)
         .includes(:user, court: [ :sport, :sports_complex ])
-        .where(reservation_date: today)
-        .where.not(status: :cancelled)
-        .where("strftime('%H:%M:%S', reservations.start_time) <= ? AND strftime('%H:%M:%S', reservations.end_time) > ?", now_time, now_time)
         .order("reservations.start_time ASC")
+
+      # ── Próximos Turnos (reutilizado para el próximo turno destacado) ──
+      @upcoming_shifts = today_scope
+        .after_time(now_time)
+        .includes(:user, court: [ :sport, :sports_complex ])
+        .order("reservations.start_time ASC")
+        .limit(5)
+        .to_a
 
       # ── Próximo Turno (destacado) ──
-      @next_shift = base
-        .includes(:user, court: [ :sport, :sports_complex ])
-        .where(reservation_date: today)
-        .where.not(status: :cancelled)
-        .where("strftime('%H:%M:%S', reservations.start_time) > ?", now_time)
-        .order("reservations.start_time ASC")
-        .first
-
+      @next_shift = @upcoming_shifts.first
       @minutes_until_next = calculate_minutes_until(@next_shift) if @next_shift
 
       # ── Estado de Canchas ──
-      @court_statuses = build_court_statuses(today, now_time)
-
-      # ── Próximos Turnos (tabla) ──
-      @upcoming_shifts = base
-        .includes(:user, court: [ :sport, :sports_complex ])
-        .where(reservation_date: today)
-        .where.not(status: :cancelled)
-        .where("strftime('%H:%M:%S', reservations.start_time) > ?", now_time)
-        .order("reservations.start_time ASC")
-        .limit(5)
+      @court_statuses = build_court_statuses(today, now_time, current_court_ids)
     end
 
     private
@@ -82,25 +60,18 @@ module Admin
       ((start_seconds - now_seconds) / 60.0).ceil
     end
 
-    def build_court_statuses(today, now_time)
+    def build_court_statuses(today, now_time, current_court_ids)
       active_courts = Court.where(is_active: true)
         .by_sports_complex(@selected_complex_id)
         .includes(:sport, :sports_complex)
         .order(:name)
 
-      # IDs de canchas con reserva en curso (1 query)
-      current_court_ids = base_reservations_scope
-        .where(reservation_date: today)
-        .where.not(status: :cancelled)
-        .where("strftime('%H:%M:%S', reservations.start_time) <= ? AND strftime('%H:%M:%S', reservations.end_time) > ?", now_time, now_time)
-        .pluck(:court_id)
-
       # Próximas reservas del día agrupadas por cancha (1 query)
       next_reservations_by_court = base_reservations_scope
+        .for_date(today)
+        .not_cancelled
+        .after_time(now_time)
         .includes(:user)
-        .where(reservation_date: today)
-        .where.not(status: :cancelled)
-        .where("strftime('%H:%M:%S', reservations.start_time) > ?", now_time)
         .order("reservations.start_time ASC")
         .group_by(&:court_id)
 

@@ -1,0 +1,44 @@
+<%# ── Próximo Turno (destacado) ── %>
+<div class="dashboard-section dashboard-section--next-shift">
+  <div class="dashboard-section-header">
+    <h2 class="dashboard-section-title">
+      <span class="section-title-icon">
+        <%= dashboard_icon(:next_shift, classes: "title-svg") %>
+      </span>
+      <%= t("dashboard.next_shift.title", default: "Próximo Turno") %>
+    </h2>
+  </div>
+
+  <% if @next_shift %>
+    <div class="dashboard-next-shift">
+      <div class="dashboard-next-shift__info">
+        <div class="dashboard-next-shift__court">
+          <%= @next_shift.court.name %>
+          <span class="dashboard-next-shift__sport"><%= @next_shift.court.sport.name %></span>
+          <span class="dashboard-next-shift__complex"><%= @next_shift.court.sports_complex.name %></span>
+        </div>
+        <div class="dashboard-next-shift__time">
+          <%= @next_shift.start_time.strftime("%H:%M") %> - <%= @next_shift.end_time.strftime("%H:%M") %> hs
+        </div>
+        <div class="dashboard-next-shift__client">
+          <strong><%= @next_shift.user.name %></strong>
+          <% if @next_shift.user.phone.present? %>
+            <span class="dashboard-next-shift__phone">
+              <%= dashboard_icon(:phone, classes: "phone-svg") %>
+              <%= @next_shift.user.phone %>
+            </span>
+          <% end %>
+        </div>
+      </div>
+      <div class="dashboard-next-shift__countdown" title="Tiempo estimado para el inicio">
+        <span class="dashboard-next-shift__countdown-value"><%= @minutes_until_next %></span>
+        <span class="dashboard-next-shift__countdown-label">
+          <%= @minutes_until_next == 1 ? t("dashboard.next_shift.minute", default: "minuto") : t("dashboard.next_shift.minutes", default: "minutos") %>
+        </span>
+      </div>
+    </div>
+  <% else %>
+    <p class="dashboard-empty-message">No hay más turnos programados para hoy.</p>
+  <% end %>
+</div>
+
