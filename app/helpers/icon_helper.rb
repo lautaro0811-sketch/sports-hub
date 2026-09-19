@@ -54,4 +54,3 @@ module IconHelper
     end
   end
 end
-
