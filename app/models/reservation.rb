@@ -3,6 +3,7 @@ class Reservation < ApplicationRecord
   belongs_to :user
 
   enum :status, { pending: 0, confirmed: 1, cancelled: 2 }, default: :pending
+  enum :payment_status, { unpaid: 0, paid: 1 }, default: :unpaid
 
   scope :by_sports_complex, ->(complex_id) {
     joins(:court).where(courts: { sports_complex_id: complex_id }) if complex_id.present?
@@ -15,6 +16,30 @@ class Reservation < ApplicationRecord
   scope :ordered_by_date, ->(direction = :desc) {
     dir = direction.to_s.downcase == "asc" ? :asc : :desc
     order(reservation_date: dir, start_time: dir)
+  }
+
+  scope :for_date, ->(date) {
+    where(reservation_date: date) if date.present?
+  }
+
+  scope :not_cancelled, -> {
+    where.not(status: :cancelled)
+  }
+
+  scope :in_progress_at, ->(time_str) {
+    where(
+      "strftime('%H:%M:%S', reservations.start_time) <= ? AND strftime('%H:%M:%S', reservations.end_time) > ?",
+      time_str,
+      time_str
+    )
+  }
+
+  scope :after_time, ->(time_str) {
+    where("strftime('%H:%M:%S', reservations.start_time) > ?", time_str)
+  }
+
+  scope :finished_before, ->(time_str) {
+    where("strftime('%H:%M:%S', reservations.end_time) <= ?", time_str)
   }
 
   validates :reservation_date, :start_time, :end_time, :total_price, presence: true

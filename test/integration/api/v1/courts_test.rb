@@ -4,6 +4,7 @@ class Api::V1::CourtsTest < ActionDispatch::IntegrationTest
   fixtures []
 
   setup do
+    travel_to Time.zone.local(2026, 9, 18, 12, 0, 0)
     @user = User.create!(name: "Usuario Test", email: "user_api_test@example.com", password: "password123")
 
     @sport = Sport.find_or_create_by!(name: "Fútbol")
@@ -30,6 +31,10 @@ class Api::V1::CourtsTest < ActionDispatch::IntegrationTest
 
     @token = JsonWebToken.encode(user_id: @user.id)
     @headers = { "Authorization" => "Bearer #{@token}", "Accept" => "application/json" }
+  end
+
+  teardown do
+    travel_back
   end
 
   test "debe listar las canchas de un complejo con estructura de fecha y turnos" do

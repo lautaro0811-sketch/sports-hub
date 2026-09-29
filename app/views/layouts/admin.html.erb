@@ -12,6 +12,7 @@
     <header class="admin-navbar">
       <div class="admin-nav-links">
         <%= link_to "SportsHub Admin", admin_root_path, class: "admin-nav-brand" %>
+        <%= link_to "Dashboard", admin_root_path, class: "admin-nav-link #{'active' if controller_name == 'dashboard'}" %>
         <%= link_to "Complejos", admin_sports_complexes_path, class: "admin-nav-link #{'active' if controller_name == 'sports_complexes'}" %>
         <%= link_to "Canchas", admin_courts_path, class: "admin-nav-link #{'active' if controller_name == 'courts'}" %>
         <%= link_to "Esquemas Tarifarios", admin_pricing_schemes_path, class: "admin-nav-link #{'active' if controller_name.in?(%w[pricing_schemes pricing_rules])}" %>

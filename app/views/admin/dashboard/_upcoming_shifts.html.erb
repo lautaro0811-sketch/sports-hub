@@ -1,0 +1,68 @@
+<%# ── Próximos Turnos (tabla) ── %>
+<div class="dashboard-section dashboard-section--table">
+  <div class="dashboard-section-header">
+    <h2 class="dashboard-section-title">
+      <span class="section-title-icon">
+        <%= dashboard_icon(:time, classes: "title-svg") %>
+      </span>
+      <%= t("dashboard.upcoming.title", default: "Próximos Turnos") %>
+    </h2>
+  </div>
+
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th><%= t("dashboard.upcoming.table.time", default: "Horario") %></th>
+        <th><%= t("dashboard.upcoming.table.client", default: "Cliente") %></th>
+        <th><%= t("dashboard.upcoming.table.court", default: "Cancha") %></th>
+        <th><%= t("dashboard.upcoming.table.complex", default: "Complejo") %></th>
+        <th><%= t("dashboard.upcoming.table.status", default: "Estado") %></th>
+        <th><%= t("dashboard.upcoming.table.payment", default: "Pago") %></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if @upcoming_shifts.any? %>
+        <% @upcoming_shifts.each do |reservation| %>
+          <tr>
+            <td>
+              <strong><%= reservation.start_time.strftime("%H:%M") %> - <%= reservation.end_time.strftime("%H:%M") %> hs</strong>
+            </td>
+            <td>
+              <strong><%= reservation.user.name %></strong>
+              <% if reservation.user.phone.present? %>
+                <span class="table-subtext"><%= reservation.user.phone %></span>
+              <% end %>
+            </td>
+            <td>
+              <%= reservation.court.name %>
+              <span class="table-subtext"><%= reservation.court.sport.name %></span>
+            </td>
+            <td><%= reservation.court.sports_complex.name %></td>
+            <td>
+              <% case reservation.status %>
+              <% when "confirmed" %>
+                <span class="badge badge-success">Confirmada</span>
+              <% when "pending" %>
+                <span class="badge badge-warning">Pendiente</span>
+              <% end %>
+            </td>
+            <td>
+              <% if reservation.paid? %>
+                <span class="badge badge-success">✓ Pagado</span>
+              <% else %>
+                <span class="badge badge-warning">⚠ Pendiente</span>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      <% else %>
+        <tr>
+          <td colspan="6" class="table-empty">
+            <%= t("dashboard.upcoming.empty", default: "No hay turnos pendientes para el resto del día.") %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+

@@ -1,0 +1,59 @@
+es:
+  date:
+    formats:
+      default: "%d/%m/%Y"
+      short: "%d de %b"
+      long: "%d de %B de %Y"
+      full: "%A %d de %B de %Y"
+    day_names: [domingo, lunes, martes, miércoles, jueves, viernes, sábado]
+    abbr_day_names: [dom, lun, mar, mié, jue, vie, sáb]
+    month_names: [~, enero, febrero, marzo, abril, mayo, junio, julio, agosto, septiembre, octubre, noviembre, diciembre]
+    abbr_month_names: [~, ene, feb, mar, abr, may, jun, jul, ago, sep, oct, nov, dic]
+  time:
+    formats:
+      default: "%d/%m/%Y %H:%M"
+      short: "%d de %b %H:%M"
+      long: "%d de %B de %Y %H:%M"
+      time_only: "%H:%M"
+      time_range: "%H:%M hs"
+  dashboard:
+    title: "Dashboard Operativo"
+    subtitle_prefix: "Operación del día"
+    filter:
+      complex_label: "Complejo"
+      all_complexes: "Todos los complejos"
+      submit: "Filtrar"
+    kpis:
+      today_reservations: "Reservas Hoy"
+      finished: "finalizadas"
+      courts_in_use: "Canchas en Uso"
+      courts_in_use_sub: "Canchas ocupadas actualmente"
+      remaining_shifts: "Turnos Restantes"
+      remaining_shifts_sub: "Reservas por disputar hoy"
+      cancellations: "Cancelaciones Hoy"
+      cancellations_sub: "reservas canceladas"
+    now:
+      title: "Ahora Mismo"
+      empty: "No hay turnos en curso."
+      in_play: "En juego"
+    next_shift:
+      title: "Próximo Turno"
+      empty: "No hay más turnos programados para hoy."
+      minute: "minuto"
+      minutes: "minutos"
+    courts_status:
+      title: "Estado de Canchas"
+      in_use: "En juego"
+      upcoming: "Próximo turno"
+      available: "Disponible"
+      no_more_shifts: "Sin más turnos hoy"
+    upcoming:
+      title: "Próximos Turnos"
+      empty: "No hay turnos pendientes para el resto del día."
+      table:
+        time: "Horario"
+        client: "Cliente"
+        court: "Cancha"
+        complex: "Complejo"
+        status: "Estado"
+        payment: "Pago"

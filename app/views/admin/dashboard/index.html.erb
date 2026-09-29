@@ -1,0 +1,50 @@
+<div class="page-header dashboard-header">
+  <div>
+    <div class="dashboard-title-row">
+      <h1 class="page-title"><%= t("dashboard.title", default: "Dashboard Operativo") %></h1>
+      <% if @selected_complex %>
+        <span class="dashboard-venue-badge">
+          <%= dashboard_icon(:building, classes: "badge-svg") %>
+          <%= @selected_complex.name %>
+        </span>
+      <% else %>
+        <span class="dashboard-venue-badge dashboard-venue-badge--all">
+          <%= dashboard_icon(:building, classes: "badge-svg") %>
+          <%= t("dashboard.filter.all_complexes", default: "Todos los complejos") %>
+        </span>
+      <% end %>
+    </div>
+    <p class="page-subtitle">
+      <%= l(Date.current, format: :full).capitalize %>
+    </p>
+  </div>
+
+  <%# ── Filtro Multi-complejo ── %>
+  <%= form_with url: admin_root_path, method: :get, data: { turbo_frame: "dashboard_content" }, class: "dashboard-filter-form" do |f| %>
+    <div class="dashboard-filter-group">
+      <%= f.label :complex_id, "#{t('dashboard.filter.complex_label', default: 'Complejo')}:", class: "dashboard-filter-label" %>
+      <%= f.select :complex_id,
+          options_for_select(
+            [[t("dashboard.filter.all_complexes", default: "Todos los complejos"), ""]] + @sports_complexes.map { |sc| [sc.name, sc.id] },
+            @selected_complex_id
+          ),
+          {},
+          class: "dashboard-filter-select",
+          "aria-label": "Seleccionar complejo deportivo",
+          onchange: "this.form.requestSubmit()" %>
+      <noscript>
+        <%= f.submit t("dashboard.filter.submit", default: "Filtrar"), class: "btn-primary dashboard-filter-submit" %>
+      </noscript>
+    </div>
+  <% end %>
+</div>
+
+<%= turbo_frame_tag "dashboard_content", data: { controller: "auto-refresh" } do %>
+
+
+  <%= render "kpis" %>
+  <%= render "now" %>
+  <%= render "next_shift" %>
+  <%= render "courts_status" %>
+  <%= render "upcoming_shifts" %>
+<% end %>

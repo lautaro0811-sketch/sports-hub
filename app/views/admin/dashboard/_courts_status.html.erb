@@ -1,0 +1,77 @@
+<%# ── Estado de Canchas ── %>
+<div class="dashboard-section dashboard-section--courts">
+  <div class="dashboard-section-header">
+    <div>
+      <h2 class="dashboard-section-title">
+        <span class="section-title-icon">
+          <%= dashboard_icon(:court, classes: "title-svg") %>
+        </span>
+        <%= t("dashboard.courts_status.title", default: "Estado de Canchas") %>
+      </h2>
+      <p class="dashboard-section-subtitle">
+        Disponibilidad en tiempo real para las canchas activas <%= @selected_complex ? "en #{@selected_complex.name}" : "del sistema" %>
+      </p>
+    </div>
+    <div class="dashboard-courts-summary">
+      <span class="courts-summary-pill courts-summary-pill--live">
+        <span class="summary-dot summary-dot--live"></span>
+        <%= @court_statuses.count { |cs| cs.status == :in_use } %> en juego
+      </span>
+      <span class="courts-summary-pill courts-summary-pill--available">
+        <span class="summary-dot summary-dot--available"></span>
+        <%= @court_statuses.count { |cs| cs.status == :available } %> libres
+      </span>
+    </div>
+  </div>
+
+  <div class="dashboard-courts-grid">
+    <% @court_statuses.each do |cs| %>
+      <div class="dashboard-court-status dashboard-court-status--<%= cs.status %>">
+        <div class="dashboard-court-status__header">
+          <div>
+            <span class="dashboard-court-status__name"><%= cs.court.name %></span>
+            <% if @selected_complex_id.blank? %>
+              <span class="dashboard-court-status__complex"><%= cs.court.sports_complex.name %></span>
+            <% end %>
+          </div>
+          <span class="dashboard-court-status__sport"><%= cs.court.sport.name %></span>
+        </div>
+
+        <div class="dashboard-court-status__badge">
+          <% case cs.status %>
+          <% when :in_use %>
+            <span class="badge badge-live">
+              <span class="badge-dot badge-dot--live" aria-hidden="true"></span>
+              <%= t("dashboard.courts_status.in_use", default: "En juego") %>
+            </span>
+          <% when :upcoming %>
+            <span class="badge badge-warning">
+              <span class="badge-dot badge-dot--warning" aria-hidden="true"></span>
+              <%= t("dashboard.courts_status.upcoming", default: "Próximo turno") %>
+            </span>
+          <% when :available %>
+            <span class="badge badge-available">
+              <span class="badge-dot badge-dot--available" aria-hidden="true"></span>
+              <%= t("dashboard.courts_status.available", default: "Disponible") %>
+            </span>
+          <% end %>
+        </div>
+
+        <% if cs.status == :upcoming && cs.next_reservation %>
+          <div class="dashboard-court-status__detail">
+            <%= cs.next_reservation.start_time.strftime("%H:%M") %> hs — <%= cs.next_reservation.user.name %>
+          </div>
+        <% elsif cs.status == :in_use && cs.next_reservation %>
+          <div class="dashboard-court-status__detail">
+            Próx: <%= cs.next_reservation.start_time.strftime("%H:%M") %> hs (<%= cs.next_reservation.user.name %>)
+          </div>
+        <% else %>
+          <div class="dashboard-court-status__detail dashboard-court-status__detail--empty">
+            <%= t("dashboard.courts_status.no_more_shifts", default: "Sin más turnos hoy") %>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>
+

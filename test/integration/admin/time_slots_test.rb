@@ -72,7 +72,7 @@ class Admin::TimeSlotsTest < ActionDispatch::IntegrationTest
     assert_equal "20:00", monday_slots[2].formatted_start_time
     assert_equal "21:00", monday_slots[2].formatted_end_time
 
-    # Verificar cálculo automático de precio y multiplicador para el turno de 19:00 (regla con mult 1.5)
+    # Verificar cálculo automático de precio y multiplicador para el turno de 19:00 (regla con mult 1.5) prueba
     slot_pico = monday_slots[1]
     assert_equal 1.5, slot_pico.effective_multiplier
     assert_equal 45000.0, slot_pico.calculated_price

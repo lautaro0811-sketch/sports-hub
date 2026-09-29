@@ -1,0 +1,44 @@
+<%# ── Ahora Mismo: reservas en curso ── %>
+<div class="dashboard-section dashboard-section--now">
+  <div class="dashboard-section-header">
+    <h2 class="dashboard-section-title">
+      <span class="section-live-indicator" aria-hidden="true"></span>
+      <%= t("dashboard.now.title", default: "Ahora Mismo") %>
+    </h2>
+    <% if @current_reservations.any? %>
+      <span class="badge badge-live">
+        <%= @current_reservations.size %> <%= @current_reservations.size == 1 ? "partido en curso" : "partidos en curso" %>
+      </span>
+    <% end %>
+  </div>
+
+  <% if @current_reservations.any? %>
+    <div class="dashboard-now-grid">
+      <% @current_reservations.each do |reservation| %>
+        <div class="dashboard-now-card">
+          <div class="dashboard-now-card__header">
+            <span class="dashboard-now-card__court"><%= reservation.court.name %></span>
+            <span class="dashboard-now-card__sport"><%= reservation.court.sport.name %></span>
+          </div>
+          <div class="dashboard-now-card__time">
+            <%= reservation.start_time.strftime("%H:%M") %> - <%= reservation.end_time.strftime("%H:%M") %> hs
+          </div>
+          <div class="dashboard-now-card__client">
+            <strong><%= reservation.user.name %></strong>
+            <% if reservation.user.phone.present? %>
+              <span class="dashboard-now-card__phone">
+                <%= dashboard_icon(:phone, classes: "phone-svg") %>
+                <%= reservation.user.phone %>
+              </span>
+            <% end %>
+          </div>
+          <div class="dashboard-now-card__status">
+            <span class="badge badge-live"><%= t("dashboard.now.in_play", default: "En juego") %></span>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="dashboard-empty-message"><%= t("dashboard.now.empty", default: "No hay turnos en curso.") %></p>
+  <% end %>
+</div>
