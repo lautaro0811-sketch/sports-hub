@@ -198,7 +198,7 @@ class Admin::DashboardControllerTest < ActionDispatch::IntegrationTest
     if (Time.current + 2.hours).to_date == Date.current
       create_reservation(@court_a, Date.current, future_start, future_end, :confirmed)
 
-      get admin_root_path, params: { status_filter: "Ocupados" }, params: { status_filter: 'Ocupados' }
+      get admin_root_path, params: { status_filter: "Ocupados" }, params: { status_filter: "Ocupados" }
       assert_response :success
       assert_select ".admin-table tbody tr", minimum: 1
       assert_match /Cliente Test/, response.body
@@ -263,7 +263,7 @@ class Admin::DashboardControllerTest < ActionDispatch::IntegrationTest
       res2 = create_reservation(@court_b, Date.current, future_start_2, future_end_2, :confirmed)
       res2.update!(payment_status: :unpaid)
 
-      get admin_root_path, params: { status_filter: "Ocupados" }, params: { status_filter: 'Ocupados' }
+      get admin_root_path, params: { status_filter: "Ocupados" }, params: { status_filter: "Ocupados" }
       assert_response :success
       assert_select ".badge-success", text: "✓ Pagado"
       assert_select ".badge-warning", text: "⚠ Pendiente"

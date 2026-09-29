@@ -19,11 +19,10 @@ created_count = 0
 
 (start_date..end_date).each do |date|
   courts.each do |court|
-    
     # 1. Ocupado / Confirmado
     start_1 = Time.zone.parse("10:00:00")
     end_1   = Time.zone.parse("11:30:00")
-    
+
     if court.available?(date, start_1, end_1)
       res1 = Reservation.new(
         court: court, user: user, reservation_date: date,
@@ -47,7 +46,7 @@ created_count = 0
       )
       created_count += 1 if res2.save(validate: false)
     end
-    
+
     # 3. Noche / Cancelado
     start_3 = Time.zone.parse("20:00:00")
     end_3   = Time.zone.parse("21:30:00")

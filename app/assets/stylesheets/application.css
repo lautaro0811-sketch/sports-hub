@@ -1913,3 +1913,55 @@ select.form-input {
     align-self: center;
   }
 }
+/* ── Carousel para Estado de Canchas ── */
+.dashboard-courts-carousel-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.dashboard-courts-carousel-container {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  gap: 16px;
+  width: 100%;
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+.dashboard-courts-carousel-container::-webkit-scrollbar {
+  display: none;
+}
+
+.dashboard-courts-carousel-container .dashboard-court-status {
+  flex-shrink: 0;
+  width: 280px; /* Ancho fijo para mantener la tarjeta intacta */
+}
+
+.dashboard-carousel-btn {
+  background-color: var(--bg-card, #fff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  z-index: 10;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  color: var(--text-color, #1e293b);
+}
+.dashboard-carousel-btn:hover {
+  background-color: var(--bg-body, #f8fafc);
+  transform: scale(1.05);
+}
+.dashboard-carousel-btn.prev {
+  margin-right: 12px;
+}
+.dashboard-carousel-btn.next {
+  margin-left: 12px;
+}
