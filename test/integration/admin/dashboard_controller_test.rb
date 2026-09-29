@@ -331,7 +331,7 @@ class Admin::DashboardControllerTest < ActionDispatch::IntegrationTest
   test "muestra selector de complejos y turbo-frame" do
     get admin_root_path
     assert_response :success
-    assert_select "turbo-frame#dashboard_content"
+    assert_select "turbo-frame#dashboard_content[data-controller='auto-refresh']"
     assert_select "select[name='complex_id']"
     assert_select "option", text: "Todos los complejos"
     assert_select "option", text: @sports_complex.name

@@ -39,9 +39,8 @@
   <% end %>
 </div>
 
-<%= turbo_frame_tag "dashboard_content" do %>
-  <%# Auto-refresh cada 60 segundos nativo dentro del frame %>
-  <meta http-equiv="refresh" content="60">
+<%= turbo_frame_tag "dashboard_content", data: { controller: "auto-refresh" } do %>
+
 
   <%= render "kpis" %>
   <%= render "now" %>
