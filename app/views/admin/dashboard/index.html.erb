@@ -1,4 +1,4 @@
-<div class="page-header dashboard-header">
+<div class="page-header dashboard-header" style="align-items: flex-start;">
   <div>
     <div class="dashboard-title-row">
       <h1 class="page-title"><%= t("dashboard.title", default: "Dashboard Operativo") %></h1>
@@ -15,36 +15,102 @@
       <% end %>
     </div>
     <p class="page-subtitle">
-      <%= l(Date.current, format: :full).capitalize %>
+      <%= l(@selected_date || Date.current, format: :full).capitalize %>
     </p>
   </div>
 
-  <%# ── Filtro Multi-complejo ── %>
+  <%# ── Filtros y Calendario ── %>
   <%= form_with url: admin_root_path, method: :get, data: { turbo_frame: "dashboard_content" }, class: "dashboard-filter-form" do |f| %>
-    <div class="dashboard-filter-group">
-      <%= f.label :complex_id, "#{t('dashboard.filter.complex_label', default: 'Complejo')}:", class: "dashboard-filter-label" %>
-      <%= f.select :complex_id,
-          options_for_select(
-            [[t("dashboard.filter.all_complexes", default: "Todos los complejos"), ""]] + @sports_complexes.map { |sc| [sc.name, sc.id] },
-            @selected_complex_id
-          ),
-          {},
-          class: "dashboard-filter-select",
-          "aria-label": "Seleccionar complejo deportivo",
-          onchange: "this.form.requestSubmit()" %>
-      <noscript>
-        <%= f.submit t("dashboard.filter.submit", default: "Filtrar"), class: "btn-primary dashboard-filter-submit" %>
-      </noscript>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <style>
+      .mini-calendar-container {
+        width: 210px;
+        height: 220px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+        overflow: hidden;
+        border: 1px solid #e2e8f0;
+      }
+      .mini-calendar-container .flatpickr-calendar {
+        transform: scale(0.65);
+        transform-origin: top left;
+        border: none !important;
+        box-shadow: none !important;
+        background: transparent;
+        margin: 0;
+      }
+      .mini-calendar-container input {
+        display: none !important;
+      }
+      .filter-fields-col {
+        display: flex; 
+        flex-direction: column; 
+        gap: 0.8rem; 
+        justify-content: flex-start;
+        padding-top: 0.2rem;
+      }
+      .filter-field-row {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 0.75rem;
+      }
+      .filter-field-row label {
+        margin: 0;
+        font-weight: 500;
+        color: #475569;
+        font-size: 0.9rem;
+      }
+      .filter-field-row select {
+        width: 180px;
+        padding: 0.35rem 0.5rem;
+        border-radius: 6px;
+        border: 1px solid #cbd5e1;
+        font-size: 0.9rem;
+      }
+    </style>
+    
+    <div style="display: flex; gap: 1.5rem; align-items: flex-start;">
+      <div class="filter-fields-col">
+        <div class="filter-field-row">
+          <%= f.label :complex_id, "Complejo:" %>
+          <%= f.select :complex_id,
+              options_for_select(
+                [[t("dashboard.filter.all_complexes", default: "Todos los complejos"), ""]] + @sports_complexes.map { |sc| [sc.name, sc.id] },
+                @selected_complex_id
+              ),
+              {},
+              "aria-label": "Seleccionar complejo deportivo",
+              onchange: "this.form.requestSubmit()" %>
+        </div>
+
+        <div class="filter-field-row">
+          <label>Estado:</label>
+          <%= f.select :status_filter, 
+              options_for_select(['Todos', 'Ocupados', 'Libres'], @status_filter), 
+              {}, 
+              onchange: "this.form.requestSubmit()" %>
+        </div>
+      </div>
+
+      <div class="mini-calendar-container" data-controller="flatpickr-inline">
+        <%= f.hidden_field :date, value: @selected_date.to_s, data: { flatpickr_inline_target: "input" } %>
+      </div>
     </div>
+    
+    <noscript>
+      <%= f.submit t("dashboard.filter.submit", default: "Filtrar"), class: "btn-primary dashboard-filter-submit" %>
+    </noscript>
   <% end %>
 </div>
 
 <%= turbo_frame_tag "dashboard_content", data: { controller: "auto-refresh" } do %>
-
-
   <%= render "kpis" %>
-  <%= render "now" %>
-  <%= render "next_shift" %>
-  <%= render "courts_status" %>
-  <%= render "upcoming_shifts" %>
+  
+  <% if @selected_date == Date.current %>
+    <%= render "courts_status" %>
+  <% end %>
+  
+  <%= render "daily_schedule" %>
 <% end %>
