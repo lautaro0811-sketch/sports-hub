@@ -5,12 +5,7 @@
       <span class="section-title-icon">
         <%= dashboard_icon(:time, classes: "title-svg") %>
       </span>
-      Agenda Diaria 
-      <% if @kpi_filter.present? %>
-        (Filtro: <%= @kpi_filter.titleize %>)
-      <% else %>
-        (<%= @status_filter %>)
-      <% end %>
+      Agenda Diaria (<%= @status_filter %>)
     </h2>
   </div>
 

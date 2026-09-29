@@ -5,7 +5,7 @@ module Admin
     def index
       @selected_date = params[:date].presence ? Date.parse(params[:date]) : Date.current
       today = @selected_date
-      
+
       if @selected_date == Date.current
         now_time = Time.current.strftime("%H:%M:%S")
       elsif @selected_date < Date.current
@@ -18,7 +18,7 @@ module Admin
       @selected_complex_id = params[:complex_id].presence
       @selected_complex = @sports_complexes.find { |sc| sc.id.to_s == @selected_complex_id.to_s } if @selected_complex_id
 
-      @status_filter = params[:status_filter] || 'Todos'
+      @status_filter = params[:status_filter] || "Todos"
 
       base = base_reservations_scope
       today_scope = base.for_date(today).not_cancelled
@@ -118,53 +118,81 @@ module Admin
     def build_daily_schedule(date, today_scope, base_scope, now_time)
       # Determinamos el scope inicial basado en el KPI seleccionado
       scope = case @kpi_filter
-              when 'en_uso'
+      when "en_uso"
                 today_scope.in_progress_at(now_time)
-              when 'restantes'
+      when "restantes"
                 today_scope.after_time(now_time)
-              when 'canceladas'
+      when "canceladas"
                 base_scope.for_date(date).where(status: :cancelled)
-              else
+      else
                 today_scope
-              end
+      end
 
       case @status_filter
-      when 'Ocupados'
+      when "Ocupados"
         @daily_schedule = scope
-          .where("reservations.status = :confirmed OR reservations.payment_status = :paid", 
-                 confirmed: Reservation.statuses[:confirmed], 
+          .where("reservations.status = :confirmed OR reservations.payment_status = :paid",
+                 confirmed: Reservation.statuses[:confirmed],
                  paid: Reservation.payment_statuses[:paid])
           .includes(:user, court: [ :sport, :sports_complex ])
           .order("reservations.start_time ASC")
-      when 'Libres'
-        @daily_schedule = []
-        courts = Court.where(is_active: true).by_sports_complex(@selected_complex_id).includes(:sport, :sports_complex)
-        reservations_by_court = scope.group_by(&:court_id)
-        
-        courts.each do |court|
+      when "Libres", "Todos"
+        if @kpi_filter.present? && @status_filter == "Todos"
+          @daily_schedule = scope.includes(:user, court: [ :sport, :sports_complex ]).order("reservations.start_time ASC").to_a
+        else
+          @daily_schedule = []
+          courts = Court.where(is_active: true).by_sports_complex(@selected_complex_id).includes(:sport, :sports_complex, :time_slots)
+          reservations_by_court = scope.includes(:user, court: [ :sport, :sports_complex ]).group_by(&:court_id)
+
+          if @status_filter == "Todos"
+            @daily_schedule += scope.includes(:user, court: [ :sport, :sports_complex ]).to_a
+          end
+
+          courts.each do |court|
           court_reservations = reservations_by_court[court.id] || []
-          
-          (8..22).each do |hour|
-            slot_start_time = Time.zone.parse("#{hour}:00:00")
-            slot_end_time = Time.zone.parse("#{hour + 1}:00:00")
-            
-            slot_start_sec = hour * 3600
-            slot_end_sec = (hour + 1) * 3600
-            
-            has_reservation = court_reservations.any? do |res|
-              res_start_sec = res.start_time.seconds_since_midnight
-              res_end_sec = res.end_time.seconds_since_midnight
-              res_start_sec < slot_end_sec && res_end_sec > slot_start_sec
+          day_time_slots = court.time_slots.select { |ts| ts.day_of_week == date.wday }
+
+          if day_time_slots.any?
+            day_time_slots.each do |ts|
+              slot_start_sec = ts.start_time.seconds_since_midnight
+              slot_end_sec = ts.end_time.seconds_since_midnight
+
+              has_reservation = court_reservations.any? do |res|
+                res_start_sec = res.start_time.seconds_since_midnight
+                res_end_sec = res.end_time.seconds_since_midnight
+                res_start_sec < slot_end_sec && res_end_sec > slot_start_sec
+              end
+
+              unless has_reservation
+                @daily_schedule << { type: :free, court: court, start_time: ts.start_time, end_time: ts.end_time }
+              end
             end
-            
-            unless has_reservation
-              @daily_schedule << { type: :free, court: court, start_time: slot_start_time, end_time: slot_end_time }
+          else
+            # Fallback a (8..22) si no hay time_slots definidos
+            (8..22).each do |hour|
+              slot_start_sec = hour * 3600
+              slot_end_sec = (hour + 1) * 3600
+
+              has_reservation = court_reservations.any? do |res|
+                res_start_sec = res.start_time.seconds_since_midnight
+                res_end_sec = res.end_time.seconds_since_midnight
+                res_start_sec < slot_end_sec && res_end_sec > slot_start_sec
+              end
+
+              unless has_reservation
+                slot_start_time = Time.zone.parse("#{hour}:00:00") || Time.current.change(hour: hour, min: 0)
+                slot_end_time = Time.zone.parse("#{hour + 1}:00:00") || Time.current.change(hour: hour + 1, min: 0)
+                @daily_schedule << { type: :free, court: court, start_time: slot_start_time, end_time: slot_end_time }
+              end
             end
           end
         end
-        @daily_schedule.sort_by! { |item| item[:start_time].seconds_since_midnight }
-      else
-        @daily_schedule = scope.includes(:user, court: [ :sport, :sports_complex ]).order("reservations.start_time ASC")
+        end
+
+        @daily_schedule.sort_by! do |item|
+          start_time = item.is_a?(Hash) ? item[:start_time] : item.start_time
+          start_time.seconds_since_midnight
+        end
       end
     end
   end

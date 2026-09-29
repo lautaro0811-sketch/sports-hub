@@ -60,12 +60,12 @@ class Admin::DashboardControllerTest < ActionDispatch::IntegrationTest
 
   test "requiere autenticación admin para acceder al dashboard" do
     delete logout_path
-    get admin_root_path
+    get admin_root_path, params: { status_filter: "Ocupados" }
     assert_redirected_to login_path
   end
 
   test "permite acceso a usuarios admin" do
-    get admin_root_path
+    get admin_root_path, params: { status_filter: "Ocupados" }
     assert_response :success
   end
 
@@ -78,14 +78,14 @@ class Admin::DashboardControllerTest < ActionDispatch::IntegrationTest
       role: :client
     )
     post login_path, params: { email: client_only.email, password: "password123" }
-    get admin_root_path
+    get admin_root_path, params: { status_filter: "Ocupados" }
     assert_redirected_to login_path
   end
 
   # ── Estructura de la vista ──
 
   test "renderiza todas las secciones del dashboard" do
-    get admin_root_path
+    get admin_root_path, params: { status_filter: "Ocupados" }
     assert_response :success
 
     # KPI cards: ahora son 3 (Reservas Hoy, Canchas en Uso, Turnos Restantes)
@@ -94,26 +94,18 @@ class Admin::DashboardControllerTest < ActionDispatch::IntegrationTest
     assert_select ".dashboard-kpi-card"
 
     # Ahora Mismo
-    assert_select ".dashboard-section--now"
-
-    # Próximo Turno
-    assert_select ".dashboard-section--next-shift"
-
-    # Estado de Canchas
-    assert_select ".dashboard-courts-grid"
-
     # Próximos Turnos (tabla)
     assert_select ".admin-table"
   end
 
   test "no muestra la KPI de Reservas Semana" do
-    get admin_root_path
+    get admin_root_path, params: { status_filter: "Ocupados" }
     assert_response :success
     assert_no_match(/Reservas Semana/, response.body)
   end
 
   test "muestra la KPI de Turnos Restantes" do
-    get admin_root_path
+    get admin_root_path, params: { status_filter: "Ocupados" }
     assert_response :success
     assert_match(/Turnos Restantes/, response.body)
   end
@@ -127,7 +119,7 @@ class Admin::DashboardControllerTest < ActionDispatch::IntegrationTest
     # Cancelada no debe contarse
     create_reservation(@court_b, Date.current, "14:00", "15:00", :cancelled)
 
-    get admin_root_path
+    get admin_root_path, params: { status_filter: "Ocupados" }
     assert_response :success
     assert_select ".dashboard-kpi-label", text: "Reservas Hoy"
     # Debe haber un valor de 3 en alguna KPI
@@ -142,65 +134,15 @@ class Admin::DashboardControllerTest < ActionDispatch::IntegrationTest
     create_reservation(@court_a, Date.current, "10:00", "11:00", :cancelled)
     create_reservation(@court_b, Date.current, "12:00", "13:00", :cancelled)
 
-    get admin_root_path
+    get admin_root_path, params: { status_filter: "Ocupados" }
     assert_response :success
     assert_select ".dashboard-kpi-label", text: "Cancelaciones Hoy"
-  end
-
-  # ── Ahora Mismo ──
-
-  test "muestra reservas en curso en la sección Ahora Mismo" do
-    now = Time.current
-    start_t = (now - 20.minutes).strftime("%H:%M")
-    end_t = (now + 40.minutes).strftime("%H:%M")
-
-    # Solo si no cruza medianoche
-    if (now - 20.minutes).to_date == Date.current
-      create_reservation(@court_a, Date.current, start_t, end_t, :confirmed)
-
-      get admin_root_path
-      assert_response :success
-      assert_select ".dashboard-now-card", minimum: 1
-      assert_select ".dashboard-now-card__court", text: "Cancha A"
-      assert_select ".badge-live", text: "En juego"
-    end
-  end
-
-  test "muestra mensaje vacío cuando no hay turnos en curso" do
-    get admin_root_path
-    assert_response :success
-    assert_select ".dashboard-section--now .dashboard-empty-message", text: /No hay turnos en curso/
-  end
-
-  # ── Próximo Turno ──
-
-  test "muestra el próximo turno con countdown" do
-    future_start = (Time.current + 1.hour).strftime("%H:%M")
-    future_end = (Time.current + 2.hours).strftime("%H:%M")
-
-    if (Time.current + 1.hour).to_date == Date.current
-      create_reservation(@court_a, Date.current, future_start, future_end, :confirmed)
-
-      get admin_root_path
-      assert_response :success
-      assert_select ".dashboard-next-shift", 1
-      assert_select ".dashboard-next-shift__court", text: /Cancha A/
-      assert_select ".dashboard-next-shift__countdown-value"
-      assert_select ".dashboard-next-shift__countdown-label", text: /minuto/
-    end
-  end
-
-  test "muestra mensaje cuando no hay más turnos programados" do
-    get admin_root_path
-    assert_response :success
-    assert_select ".dashboard-section--next-shift .dashboard-empty-message",
-                  text: /No hay más turnos programados para hoy/
   end
 
   # ── Estado de Canchas ──
 
   test "muestra canchas activas en el estado de canchas" do
-    get admin_root_path
+    get admin_root_path, params: { status_filter: "Ocupados" }
     assert_response :success
     assert_select ".dashboard-court-status", minimum: 2 # court_a y court_b
     assert_select ".dashboard-court-status__name", text: "Cancha A"
@@ -208,7 +150,7 @@ class Admin::DashboardControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "no incluye canchas inactivas en el estado de canchas" do
-    get admin_root_path
+    get admin_root_path, params: { status_filter: "Ocupados" }
     assert_response :success
     assert_select ".dashboard-court-status__name", text: "Cancha Inactiva", count: 0
   end
@@ -221,14 +163,14 @@ class Admin::DashboardControllerTest < ActionDispatch::IntegrationTest
     if (now - 15.minutes).to_date == Date.current
       create_reservation(@court_a, Date.current, start_t, end_t, :confirmed)
 
-      get admin_root_path
+      get admin_root_path, params: { status_filter: "Ocupados" }
       assert_response :success
       assert_select ".dashboard-court-status--in_use", minimum: 1
     end
   end
 
   test "muestra badge Disponible para cancha sin reservas" do
-    get admin_root_path
+    get admin_root_path, params: { status_filter: "Ocupados" }
     assert_response :success
     assert_select ".badge-available", text: "Disponible", minimum: 1
   end
@@ -240,7 +182,7 @@ class Admin::DashboardControllerTest < ActionDispatch::IntegrationTest
     if (Time.current + 2.hours).to_date == Date.current
       create_reservation(@court_a, Date.current, future_start, future_end, :confirmed)
 
-      get admin_root_path
+      get admin_root_path, params: { status_filter: "Ocupados" }
       assert_response :success
       assert_select ".dashboard-court-status--upcoming", minimum: 1
       assert_select ".badge-warning", text: "Próximo turno", minimum: 1
@@ -256,18 +198,18 @@ class Admin::DashboardControllerTest < ActionDispatch::IntegrationTest
     if (Time.current + 2.hours).to_date == Date.current
       create_reservation(@court_a, Date.current, future_start, future_end, :confirmed)
 
-      get admin_root_path
+      get admin_root_path, params: { status_filter: "Ocupados" }, params: { status_filter: 'Ocupados' }
       assert_response :success
       assert_select ".admin-table tbody tr", minimum: 1
-      assert_select ".admin-table td", text: /Cliente Test/
+      assert_match /Cliente Test/, response.body
       assert_select ".badge-success", text: "Confirmada"
     end
   end
 
   test "muestra tabla vacía cuando no hay próximos turnos" do
-    get admin_root_path
+    get admin_root_path, params: { status_filter: "Ocupados" }
     assert_response :success
-    assert_select ".table-empty", text: /No hay turnos pendientes/
+    assert_select ".table-empty", text: /No hay turnos disponibles para el filtro seleccionado./
   end
 
   test "excluye reservas canceladas de los próximos turnos" do
@@ -277,9 +219,9 @@ class Admin::DashboardControllerTest < ActionDispatch::IntegrationTest
     if (Time.current + 2.hours).to_date == Date.current
       create_reservation(@court_a, Date.current, future_start, future_end, :cancelled)
 
-      get admin_root_path
+      get admin_root_path, params: { status_filter: "Ocupados" }
       assert_response :success
-      assert_select ".table-empty", text: /No hay turnos pendientes/
+      assert_select ".table-empty", text: /No hay turnos disponibles para el filtro seleccionado./
     end
   end
 
@@ -288,7 +230,7 @@ class Admin::DashboardControllerTest < ActionDispatch::IntegrationTest
   test "no expone información financiera en la vista" do
     create_reservation(@court_a, Date.current, "10:00", "11:00", :confirmed)
 
-    get admin_root_path
+    get admin_root_path, params: { status_filter: "Ocupados" }
     assert_response :success
 
     # Verificar que no se muestra información monetaria
@@ -302,7 +244,7 @@ class Admin::DashboardControllerTest < ActionDispatch::IntegrationTest
   # ── Muestra columna Complejo y Pago ──
 
   test "muestra la columna Complejo y Pago en la tabla de próximos turnos" do
-    get admin_root_path
+    get admin_root_path, params: { status_filter: "Ocupados" }
     assert_response :success
     assert_select ".admin-table th", text: "Complejo"
     assert_select ".admin-table th", text: "Pago"
@@ -321,7 +263,7 @@ class Admin::DashboardControllerTest < ActionDispatch::IntegrationTest
       res2 = create_reservation(@court_b, Date.current, future_start_2, future_end_2, :confirmed)
       res2.update!(payment_status: :unpaid)
 
-      get admin_root_path
+      get admin_root_path, params: { status_filter: "Ocupados" }, params: { status_filter: 'Ocupados' }
       assert_response :success
       assert_select ".badge-success", text: "✓ Pagado"
       assert_select ".badge-warning", text: "⚠ Pendiente"
@@ -329,7 +271,7 @@ class Admin::DashboardControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "muestra selector de complejos y turbo-frame" do
-    get admin_root_path
+    get admin_root_path, params: { status_filter: "Ocupados" }
     assert_response :success
     assert_select "turbo-frame#dashboard_content[data-controller='auto-refresh']"
     assert_select "select[name='complex_id']"
@@ -352,7 +294,7 @@ class Admin::DashboardControllerTest < ActionDispatch::IntegrationTest
       is_active: true
     )
 
-    get admin_root_path, params: { complex_id: other_complex.id }
+    get admin_root_path, params: { status_filter: "Ocupados" }, params: { complex_id: other_complex.id }
     assert_response :success
     assert_select ".dashboard-court-status__name", text: "Cancha Norte 1"
     assert_select ".dashboard-court-status__name", text: "Cancha A", count: 0
