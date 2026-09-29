@@ -1,0 +1,97 @@
+<%# ── Agenda Diaria (tabla) ── %>
+<div class="dashboard-section dashboard-section--table">
+  <div class="dashboard-section-header">
+    <h2 class="dashboard-section-title">
+      <span class="section-title-icon">
+        <%= dashboard_icon(:time, classes: "title-svg") %>
+      </span>
+      Agenda Diaria (<%= @status_filter %>)
+    </h2>
+  </div>
+
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th><%= t("dashboard.upcoming.table.time", default: "Horario") %></th>
+        <th><%= t("dashboard.upcoming.table.client", default: "Cliente") %></th>
+        <th><%= t("dashboard.upcoming.table.court", default: "Cancha") %></th>
+        <th><%= t("dashboard.upcoming.table.complex", default: "Complejo") %></th>
+        <th><%= t("dashboard.upcoming.table.status", default: "Estado") %></th>
+        <th><%= t("dashboard.upcoming.table.payment", default: "Pago") %></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if @daily_schedule.any? %>
+        <% @daily_schedule.each do |item| %>
+          <% if item.is_a?(Hash) && item[:type] == :free %>
+            <tr class="table-row-free" style="background-color: #f8fafc; border-left: 4px solid #10b981;">
+              <td>
+                <strong><%= item[:start_time].strftime("%H:%M") %> - <%= item[:end_time].strftime("%H:%M") %> hs</strong>
+              </td>
+              <td class="text-muted"><em>— Libre —</em></td>
+              <td>
+                <%= item[:court].name %>
+                <span class="table-subtext"><%= item[:court].sport.name %></span>
+              </td>
+              <td><%= item[:court].sports_complex.name %></td>
+              <td>
+                <span class="badge" style="background-color: #10b981; color: white;">Disponible</span>
+              </td>
+              <td>-</td>
+            </tr>
+          <% else %>
+            <% reservation = item %>
+            <tr>
+              <td>
+                <strong><%= reservation.start_time.strftime("%H:%M") %> - <%= reservation.end_time.strftime("%H:%M") %> hs</strong>
+              </td>
+              <td>
+                <strong><%= reservation.user.name %></strong>
+                <% if reservation.user.phone.present? %>
+                  <span class="table-subtext"><%= reservation.user.phone %></span>
+                <% end %>
+              </td>
+              <td>
+                <%= reservation.court.name %>
+                <span class="table-subtext"><%= reservation.court.sport.name %></span>
+              </td>
+              <td><%= reservation.court.sports_complex.name %></td>
+              <td>
+                <% case reservation.status %>
+                <% when "confirmed" %>
+                  <span class="badge badge-success">Confirmada</span>
+                <% when "pending" %>
+                  <span class="badge badge-warning">Pendiente</span>
+                <% end %>
+              </td>
+              <td>
+                <% if reservation.paid? %>
+                  <span class="badge badge-success">✓ Pagado</span>
+                <% else %>
+                  <span class="badge badge-warning">⚠ Pendiente</span>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        <% end %>
+      <% else %>
+        <tr>
+          <td colspan="6" class="table-empty">
+            No hay turnos disponibles para el filtro seleccionado.
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+  <% if @pagy && @pagy.pages > 1 %>
+    <div class="pagination-container">
+      <div class="pagination-info">
+        Mostrando <strong><%= @pagy.from %></strong> - <strong><%= @pagy.to %></strong> de <strong><%= @pagy.count %></strong> turnos
+      </div>
+      <div class="pagination-links">
+        <%== pagy_nav(@pagy) %>
+      </div>
+    </div>
+  <% end %>
+</div>
