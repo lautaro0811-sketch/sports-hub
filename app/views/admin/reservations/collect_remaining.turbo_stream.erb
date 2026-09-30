@@ -1,0 +1,5 @@
+<%= turbo_stream.replace "reservation_payment_#{@reservation.id}" do %>
+  <%= turbo_frame_tag "reservation_payment_#{@reservation.id}" do %>
+    <span class="badge badge-success">✓ Pagado Completo</span>
+  <% end %>
+<% end %>
