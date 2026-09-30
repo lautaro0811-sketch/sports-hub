@@ -43,7 +43,7 @@ Rails.application.routes.draw do
 
       resources :reservations, only: %i[index show create destroy]
 
-      resources :deposits, only: [:create] do
+      resources :deposits, only: %i[create] do
         collection do
           post :webhook
         end
