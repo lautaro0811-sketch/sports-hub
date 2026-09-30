@@ -79,10 +79,21 @@
                 <% end %>
               </td>
               <td>
-                <% if reservation.paid? %>
-                  <span class="badge badge-success">✓ Pagado</span>
-                <% else %>
-                  <span class="badge badge-warning">⚠ Pendiente</span>
+                <%= turbo_frame_tag "reservation_payment_#{reservation.id}" do %>
+                  <% case reservation.payment_status %>
+                  <% when "unpaid" %>
+                    <span class="badge badge-warning">⚠ Pendiente</span>
+                  <% when "partially_paid" %>
+                    <span class="badge badge-info">⏱ Seña Pagada</span>
+                    <%= button_to "Cobrar Resto",
+                          collect_remaining_admin_reservation_path(reservation),
+                          method: :patch,
+                          class: "btn btn-sm btn-success",
+                          style: "margin-top: 4px;",
+                          data: { turbo_confirm: "¿Confirmar cobro del saldo restante ($#{reservation.remaining_balance.to_i})?" } %>
+                  <% when "paid" %>
+                    <span class="badge badge-success">✓ Pagado Completo</span>
+                  <% end %>
                 <% end %>
               </td>
             </tr>
