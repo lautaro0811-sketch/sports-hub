@@ -1333,14 +1333,25 @@ select.form-input {
   border-radius: var(--radius-lg);
   padding: 20px;
   box-shadow: var(--shadow-sm);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
   position: relative;
   overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
 }
 
 .dashboard-kpi-card:hover {
   border-color: var(--secondary-color);
   box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.dashboard-kpi-card.is-active,
+.dashboard-kpi-card--active {
+  border-color: var(--brand-accent, #059669);
+  box-shadow: 0 0 0 2px var(--brand-accent, #059669), var(--shadow-md);
+  background-color: var(--brand-accent-bg, #ecfdf5);
 }
 
 .dashboard-kpi-icon {

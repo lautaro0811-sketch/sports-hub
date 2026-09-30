@@ -5,7 +5,19 @@
       <span class="section-title-icon">
         <%= dashboard_icon(:time, classes: "title-svg") %>
       </span>
-      Agenda Diaria (<%= @status_filter %>)
+      Agenda Diaria
+      <% if @kpi_filter.present? %>
+        <% kpi_title = case @kpi_filter
+           when "reservas_hoy" then "Reservas Hoy"
+           when "en_uso" then "Canchas en Uso"
+           when "restantes" then "Turnos Restantes"
+           when "canceladas" then "Cancelaciones Hoy"
+           else @kpi_filter.humanize
+           end %>
+        — <%= kpi_title %>
+      <% else %>
+        (<%= @status_filter %>)
+      <% end %>
     </h2>
   </div>
 
@@ -62,6 +74,8 @@
                   <span class="badge badge-success">Confirmada</span>
                 <% when "pending" %>
                   <span class="badge badge-warning">Pendiente</span>
+                <% when "cancelled" %>
+                  <span class="badge badge-danger">Cancelada</span>
                 <% end %>
               </td>
               <td>
