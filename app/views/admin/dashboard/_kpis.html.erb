@@ -1,7 +1,9 @@
 <%# ── KPI Cards ── %>
 <div class="dashboard-kpi-grid">
   <%# Reservas Hoy %>
-  <%= link_to admin_root_path(date: params[:date], complex_id: params[:complex_id], status_filter: 'Todos', kpi_filter: 'reservas_hoy'), class: "dashboard-kpi-card", style: "text-decoration: none; color: inherit; #{'border-color: var(--primary-color); box-shadow: var(--shadow-md);' if @kpi_filter == 'reservas_hoy'}" do %>
+  <%= link_to admin_root_path(date: params[:date], complex_id: params[:complex_id], status_filter: 'Todos', kpi_filter: (@kpi_filter == 'reservas_hoy' ? nil : 'reservas_hoy')),
+              class: "dashboard-kpi-card #{'is-active' if @kpi_filter == 'reservas_hoy'}",
+              data: { turbo_frame: "dashboard_content" } do %>
     <div class="dashboard-kpi-icon dashboard-kpi-icon--primary">
       <%= dashboard_icon(:calendar, classes: "kpi-svg") %>
     </div>
@@ -13,7 +15,9 @@
   <% end %>
 
   <%# Canchas en Uso %>
-  <%= link_to admin_root_path(date: params[:date], complex_id: params[:complex_id], status_filter: 'Todos', kpi_filter: 'en_uso'), class: "dashboard-kpi-card", style: "text-decoration: none; color: inherit; #{'border-color: var(--primary-color); box-shadow: var(--shadow-md);' if @kpi_filter == 'en_uso'}" do %>
+  <%= link_to admin_root_path(date: params[:date], complex_id: params[:complex_id], status_filter: 'Todos', kpi_filter: (@kpi_filter == 'en_uso' ? nil : 'en_uso')),
+              class: "dashboard-kpi-card #{'is-active' if @kpi_filter == 'en_uso'}",
+              data: { turbo_frame: "dashboard_content" } do %>
     <div class="dashboard-kpi-icon dashboard-kpi-icon--success">
       <%= dashboard_icon(:court, classes: "kpi-svg") %>
     </div>
@@ -28,7 +32,9 @@
   <% end %>
 
   <%# Turnos Restantes %>
-  <%= link_to admin_root_path(date: params[:date], complex_id: params[:complex_id], status_filter: 'Todos', kpi_filter: 'restantes'), class: "dashboard-kpi-card", style: "text-decoration: none; color: inherit; #{'border-color: var(--primary-color); box-shadow: var(--shadow-md);' if @kpi_filter == 'restantes'}" do %>
+  <%= link_to admin_root_path(date: params[:date], complex_id: params[:complex_id], status_filter: 'Todos', kpi_filter: (@kpi_filter == 'restantes' ? nil : 'restantes')),
+              class: "dashboard-kpi-card #{'is-active' if @kpi_filter == 'restantes'}",
+              data: { turbo_frame: "dashboard_content" } do %>
     <div class="dashboard-kpi-icon dashboard-kpi-icon--info">
       <%= dashboard_icon(:clock, classes: "kpi-svg") %>
     </div>
@@ -40,7 +46,9 @@
   <% end %>
 
   <%# Cancelaciones Hoy %>
-  <%= link_to admin_root_path(date: params[:date], complex_id: params[:complex_id], status_filter: 'Todos', kpi_filter: 'canceladas'), class: "dashboard-kpi-card", style: "text-decoration: none; color: inherit; #{'border-color: var(--primary-color); box-shadow: var(--shadow-md);' if @kpi_filter == 'canceladas'}" do %>
+  <%= link_to admin_root_path(date: params[:date], complex_id: params[:complex_id], status_filter: 'Todos', kpi_filter: (@kpi_filter == 'canceladas' ? nil : 'canceladas')),
+              class: "dashboard-kpi-card #{'is-active' if @kpi_filter == 'canceladas'}",
+              data: { turbo_frame: "dashboard_content" } do %>
     <div class="dashboard-kpi-icon dashboard-kpi-icon--danger">
       <%= dashboard_icon(:cancelled, classes: "kpi-svg") %>
     </div>

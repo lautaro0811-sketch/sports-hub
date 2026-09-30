@@ -110,33 +110,75 @@ class Admin::DashboardControllerTest < ActionDispatch::IntegrationTest
     assert_match(/Turnos Restantes/, response.body)
   end
 
-  # ── KPI: Reservas Hoy ──
+  # ── KPI Cards & Interactive Buttons ──
 
-  test "muestra el conteo de reservas de hoy en la KPI" do
-    create_reservation(@court_a, Date.current, "10:00", "11:00", :confirmed)
-    create_reservation(@court_b, Date.current, "11:00", "12:00", :confirmed)
-    create_reservation(@court_a, Date.current, "14:00", "15:00", :pending)
-    # Cancelada no debe contarse
-    create_reservation(@court_b, Date.current, "14:00", "15:00", :cancelled)
-
-    get admin_root_path, params: { status_filter: "Ocupados" }
+  test "los botones de las KPIs tienen enlaces interactivos con kpi_filter" do
+    get admin_root_path
     assert_response :success
-    assert_select ".dashboard-kpi-label", text: "Reservas Hoy"
-    # Debe haber un valor de 3 en alguna KPI
-    assert_select ".dashboard-kpi-card" do
-      assert_select ".dashboard-kpi-label", text: "Reservas Hoy"
-    end
+
+    assert_select "a.dashboard-kpi-card[href*='kpi_filter=reservas_hoy']"
+    assert_select "a.dashboard-kpi-card[href*='kpi_filter=en_uso']"
+    assert_select "a.dashboard-kpi-card[href*='kpi_filter=restantes']"
+    assert_select "a.dashboard-kpi-card[href*='kpi_filter=canceladas']"
   end
 
-  # ── KPI: Cancelaciones Hoy ──
+  test "filtrar por kpi_filter reservas_hoy muestra las reservas del día y activa la card" do
+    create_reservation(@court_a, Date.current, "10:00", "11:00", :confirmed)
+    create_reservation(@court_b, Date.current, "15:00", "16:00", :pending)
 
-  test "muestra cancelaciones del día" do
-    create_reservation(@court_a, Date.current, "10:00", "11:00", :cancelled)
-    create_reservation(@court_b, Date.current, "12:00", "13:00", :cancelled)
-
-    get admin_root_path, params: { status_filter: "Ocupados" }
+    get admin_root_path, params: { kpi_filter: "reservas_hoy" }
     assert_response :success
-    assert_select ".dashboard-kpi-label", text: "Cancelaciones Hoy"
+    assert_select "a.dashboard-kpi-card.is-active", count: 1
+    assert_select ".dashboard-section-title", text: /Reservas Hoy/
+    assert_select ".admin-table tbody tr", count: 2
+  end
+
+  test "filtrar por kpi_filter en_uso muestra reservas en curso" do
+    # Time is 14:00
+    create_reservation(@court_a, Date.current, "13:30", "14:30", :confirmed)
+    create_reservation(@court_b, Date.current, "16:00", "17:00", :confirmed)
+
+    get admin_root_path, params: { kpi_filter: "en_uso" }
+    assert_response :success
+    assert_select "a.dashboard-kpi-card.is-active", count: 1
+    assert_select ".dashboard-section-title", text: /Canchas en Uso/
+    assert_select ".admin-table tbody tr", count: 1
+    assert_select ".admin-table td", text: /#{@court_a.name}/
+  end
+
+  test "filtrar por kpi_filter restantes muestra turnos restantes del día" do
+    # Time is 14:00
+    create_reservation(@court_a, Date.current, "10:00", "11:00", :confirmed)
+    create_reservation(@court_b, Date.current, "16:00", "17:00", :confirmed)
+
+    get admin_root_path, params: { kpi_filter: "restantes" }
+    assert_response :success
+    assert_select "a.dashboard-kpi-card.is-active", count: 1
+    assert_select ".dashboard-section-title", text: /Turnos Restantes/
+    assert_select ".admin-table tbody tr", count: 1
+    assert_select ".admin-table td", text: /#{@court_b.name}/
+  end
+
+  test "filtrar por kpi_filter canceladas muestra reservas canceladas con badge roja" do
+    create_reservation(@court_a, Date.current, "10:00", "11:00", :cancelled)
+    create_reservation(@court_b, Date.current, "16:00", "17:00", :confirmed)
+
+    get admin_root_path, params: { kpi_filter: "canceladas" }
+    assert_response :success
+    assert_select "a.dashboard-kpi-card.is-active", count: 1
+    assert_select ".dashboard-section-title", text: /Cancelaciones Hoy/
+    assert_select ".admin-table tbody tr", count: 1
+    assert_select ".admin-table td", text: /#{@court_a.name}/
+    assert_select ".badge-danger", text: "Cancelada"
+  end
+
+  test "hacer clic en un KPI activo desactiva el filtro (toggle)" do
+    get admin_root_path, params: { kpi_filter: "reservas_hoy" }
+    assert_response :success
+    # La card de reservas_hoy activa debe enlazar sin kpi_filter para desactivarse
+    assert_select "a.dashboard-kpi-card.is-active" do |links|
+      assert_no_match(/kpi_filter=reservas_hoy/, links.first["href"])
+    end
   end
 
   # ── Estado de Canchas ──
@@ -198,7 +240,7 @@ class Admin::DashboardControllerTest < ActionDispatch::IntegrationTest
     if (Time.current + 2.hours).to_date == Date.current
       create_reservation(@court_a, Date.current, future_start, future_end, :confirmed)
 
-      get admin_root_path, params: { status_filter: "Ocupados" }, params: { status_filter: "Ocupados" }
+      get admin_root_path, params: { status_filter: "Ocupados" }
       assert_response :success
       assert_select ".admin-table tbody tr", minimum: 1
       assert_match /Cliente Test/, response.body
@@ -263,7 +305,7 @@ class Admin::DashboardControllerTest < ActionDispatch::IntegrationTest
       res2 = create_reservation(@court_b, Date.current, future_start_2, future_end_2, :confirmed)
       res2.update!(payment_status: :unpaid)
 
-      get admin_root_path, params: { status_filter: "Ocupados" }, params: { status_filter: "Ocupados" }
+      get admin_root_path, params: { status_filter: "Ocupados" }
       assert_response :success
       assert_select ".badge-success", text: "✓ Pagado"
       assert_select ".badge-warning", text: "⚠ Pendiente"
@@ -294,7 +336,7 @@ class Admin::DashboardControllerTest < ActionDispatch::IntegrationTest
       is_active: true
     )
 
-    get admin_root_path, params: { status_filter: "Ocupados" }, params: { complex_id: other_complex.id }
+    get admin_root_path, params: { status_filter: "Ocupados", complex_id: other_complex.id }
     assert_response :success
     assert_select ".dashboard-court-status__name", text: "Cancha Norte 1"
     assert_select ".dashboard-court-status__name", text: "Cancha A", count: 0
