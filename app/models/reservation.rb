@@ -3,7 +3,7 @@ class Reservation < ApplicationRecord
   belongs_to :user
 
   enum :status, { pending: 0, confirmed: 1, cancelled: 2 }, default: :pending
-  enum :payment_status, { unpaid: 0, paid: 1 }, default: :unpaid
+  enum :payment_status, { unpaid: 0, partially_paid: 1, paid: 2 }, default: :unpaid
 
   scope :by_sports_complex, ->(complex_id) {
     joins(:court).where(courts: { sports_complex_id: complex_id }) if complex_id.present?
@@ -62,6 +62,18 @@ class Reservation < ApplicationRecord
       start_time.sec
     )
   end
+
+  # ── Seña / Depósito ──
+
+  def calculate_required_deposit
+    (total_price * 0.30).round(2)
+  end
+
+  def remaining_balance
+    total_price - (deposit_amount || 0)
+  end
+
+  # ── Cancelación ──
 
   def can_be_cancelled?
     return false if cancelled?

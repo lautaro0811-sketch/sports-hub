@@ -24,7 +24,11 @@ Rails.application.routes.draw do
         end
       end
     end
-    resources :reservations, only: %i[index show update]
+    resources :reservations, only: %i[index show update] do
+      member do
+        patch :collect_remaining
+      end
+    end
   end
 
   namespace :api, defaults: { format: :json } do
@@ -38,6 +42,12 @@ Rails.application.routes.draw do
       resources :courts, only: %i[index show]
 
       resources :reservations, only: %i[index show create destroy]
+
+      resources :deposits, only: %i[create] do
+        collection do
+          post :webhook
+        end
+      end
     end
   end
 end

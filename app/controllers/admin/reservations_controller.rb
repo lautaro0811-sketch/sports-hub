@@ -10,5 +10,20 @@ module Admin
 
       @pagy, @reservations = pagy(reservations_scope, limit: 10)
     end
+
+    def collect_remaining
+      @reservation = Reservation.find(params[:id])
+
+      if @reservation.partially_paid?
+        @reservation.update!(payment_status: :paid)
+
+        respond_to do |format|
+          format.turbo_stream
+          format.html { redirect_to admin_root_path, notice: "Pago completado exitosamente." }
+        end
+      else
+        redirect_to admin_root_path, alert: "La reserva no tiene una seña pagada para cobrar el saldo restante."
+      end
+    end
   end
 end

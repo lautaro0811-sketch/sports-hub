@@ -307,7 +307,7 @@ class Admin::DashboardControllerTest < ActionDispatch::IntegrationTest
 
       get admin_root_path, params: { status_filter: "Ocupados" }
       assert_response :success
-      assert_select ".badge-success", text: "✓ Pagado"
+      assert_select ".badge-success", text: "✓ Pagado Completo"
       assert_select ".badge-warning", text: "⚠ Pendiente"
     end
   end
