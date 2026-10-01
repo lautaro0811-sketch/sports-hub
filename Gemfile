@@ -69,4 +69,4 @@ end
 gem "jwt"
 
 # Paginación ligera y de alto rendimiento
-gem "pagy", "~> 9.0"
+gem "pagy", "~> 43.6"
