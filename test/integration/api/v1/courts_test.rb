@@ -141,4 +141,14 @@ class Api::V1::CourtsTest < ActionDispatch::IntegrationTest
     court_ids = response.parsed_body["courts"].map { |c| c["id"] }
     assert_not_includes court_ids, @court.id
   end
+
+  test "permite consultar canchas de forma publica sin header Authorization" do
+    get api_v1_courts_url
+
+    assert_response :success
+    body = response.parsed_body
+    assert_kind_of Array, body["courts"]
+    court_data = body["courts"].first
+    assert court_data.key?("image_url")
+  end
 end

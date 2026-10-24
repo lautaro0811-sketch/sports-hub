@@ -70,3 +70,6 @@ gem "jwt"
 
 # Paginación ligera y de alto rendimiento
 gem "pagy", "~> 9.0"
+
+# Soporte para Cross-Origin Resource Sharing (CORS) para consumo desde el frontend
+gem "rack-cors"

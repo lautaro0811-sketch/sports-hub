@@ -34,6 +34,10 @@ Rails.application.routes.draw do
   namespace :api, defaults: { format: :json } do
     namespace :v1 do
       post "auth/login", to: "authentication#login"
+      post "auth/register", to: "authentication#register"
+      get "auth/me", to: "authentication#me"
+
+      resources :sports, only: %i[index]
 
       resources :sports_complexes, only: %i[index show] do
         resources :courts, only: %i[index show]

@@ -129,4 +129,10 @@ class Court < ApplicationRecord
                 .where("start_time < ? AND end_time > ?", end_time, start_time)
                 .none?
   end
+
+  def image_url
+    return unless image.attached?
+
+    Rails.application.routes.url_helpers.rails_blob_path(image, only_path: true)
+  end
 end

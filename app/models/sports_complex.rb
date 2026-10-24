@@ -25,4 +25,10 @@ class SportsComplex < ApplicationRecord
   def active_courts
     courts.where(is_active: true)
   end
+
+  def cover_photo_url
+    return unless cover_photo.attached?
+
+    Rails.application.routes.url_helpers.rails_blob_path(cover_photo, only_path: true)
+  end
 end

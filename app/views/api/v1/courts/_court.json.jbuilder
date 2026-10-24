@@ -4,6 +4,7 @@ json.surface_type court.surface_type
 json.base_price court.base_price.to_f
 json.is_active court.is_active
 json.pricing_scheme_name court.pricing_scheme_name
+json.image_url court.image_url
 if court.sport.present?
   json.sport do
     json.id court.sport.id

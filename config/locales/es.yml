@@ -1,4 +1,16 @@
 es:
+  errors:
+    messages:
+      taken: "ya está en uso"
+      blank: "no puede estar en blanco"
+      invalid: "es inválido"
+      too_short: "es demasiado corto (mínimo %{count} caracteres)"
+  activerecord:
+    errors:
+      messages:
+        taken: "ya está en uso"
+        blank: "no puede estar en blanco"
+        invalid: "es inválido"
   date:
     formats:
       default: "%d/%m/%Y"

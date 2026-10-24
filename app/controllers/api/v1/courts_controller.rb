@@ -1,6 +1,7 @@
 module Api
   module V1
     class CourtsController < BaseController
+      skip_before_action :authenticate_api_user!, only: %i[index show]
       before_action :set_sports_complex, if: -> { params[:sports_complex_id].present? }
       before_action :set_target_date, only: %i[index show]
 
