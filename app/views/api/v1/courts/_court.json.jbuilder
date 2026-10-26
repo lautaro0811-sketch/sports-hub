@@ -14,6 +14,17 @@ else
   json.sport nil
 end
 
+if court.sports_complex.present?
+  json.sports_complex do
+    json.id court.sports_complex.id
+    json.name court.sports_complex.name
+    json.address court.sports_complex.address
+    json.city court.sports_complex.city
+  end
+else
+  json.sports_complex nil
+end
+
 slots_for_day = court.time_slots.select { |slot| slot.day_of_week == date.wday }
                                  .sort_by(&:start_time)
 
