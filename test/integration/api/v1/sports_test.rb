@@ -22,4 +22,3 @@ class Api::V1::SportsTest < ActionDispatch::IntegrationTest
     assert body.first.key?("courts_count")
   end
 end
-

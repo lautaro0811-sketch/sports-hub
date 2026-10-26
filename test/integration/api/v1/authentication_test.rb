@@ -86,4 +86,3 @@ class Api::V1::AuthenticationTest < ActionDispatch::IntegrationTest
     assert_includes response.parsed_body["error"], "No autorizado"
   end
 end
-
