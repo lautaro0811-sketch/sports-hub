@@ -1,166 +1,157 @@
-# Sports Hub - Plataforma de Gestión y Reserva de Canchas Deportivas
+# Sports Hub — Backend (API Rails)
 
-Sports Hub es una aplicación web backend desarrollada con Ruby on Rails que centraliza la administración de complejos deportivos, la oferta de canchas y el flujo de reservas para los usuarios finales. El proyecto incluye una interfaz administrativa tradicional (Back-office) y una API RESTful versionada orientada a ser consumida por clientes frontend o aplicaciones móviles.
-
----
-
-## Características Principales
-
-* Back-office Administrativo: Panel de control con arquitectura MVC tradicional protegido por autenticación para la gestión de complejos deportivos, canchas, horarios y visualización de reservas.
-* API RESTful Versionada (/api/v1): Endpoints en formato JSON que permiten consultar la oferta deportiva y concretar reservas.
-* Autenticación por Tokens (JWT): Mecanismo de autenticación desacoplado para usuarios de la API mediante JSON Web Tokens.
-* Reglas de Dominio y Consistencia: Validaciones a nivel de modelo para evitar solapamientos de turnos en una misma cancha y restricciones de reservas en fechas pasadas.
-* Archivos Multimedia: Soporte para adjuntar imágenes a complejos y canchas mediante Active Storage.
-* Notificaciones por Email: Confirmación automática de reservas por correo electrónico utilizando plantillas HTML y de texto plano a través de Action Mailer.
-* Suite de Pruebas Automatizadas: Cobertura de tests unitarios de modelos y pruebas de integración sobre los controladores y flujos de la API.
+Plataforma de gestión y reserva de canchas deportivas. Backend desarrollado con **Ruby on Rails 8**, exponiendo una API REST versionada (`/api/v1`) y un back-office administrativo.
 
 ---
 
-## Requisitos del Sistema
+## Stack Tecnológico
 
-* Ruby: >= 3.2.0
-* Rails: 8.x
-* Base de Datos: SQLite3 (entornos de desarrollo y test)
-* Gestor de dependencias: Bundler
+- **Ruby:** 3.4.x (gestionado con `mise`)
+- **Rails:** 8.1.x
+- **Base de Datos:** SQLite3 (desarrollo y test)
+- **Autenticación:** JWT (`gem jwt`) + `has_secure_password` (bcrypt)
+- **Multimedia:** Active Storage
+- **Email:** Action Mailer
+- **Tests:** Minitest (103 tests · 0 fallas)
+- **Calidad de Código:** RuboCop · Brakeman
 
 ---
 
 ## Instalación y Puesta en Marcha
 
-1. Clonar el repositorio y acceder a la carpeta:
-git clone <URL_DEL_REPOSITORIO>
-cd proyecto_rails
+### Requisitos previos
+- Ruby >= 3.2 instalado (recomendado con `mise`)
+- Bundler
 
-2. Instalar dependencias:
+```bash
+# 1. Clonar e ingresar al repositorio
+git clone https://github.com/lautaro0811-sketch/sports-hub.git
+cd sports-hub
+
+# 2. Instalar dependencias
 bundle install
 
-3. Configurar la base de datos (creación, migraciones y datos de prueba):
+# 3. Crear base de datos, correr migraciones y cargar datos de prueba
 bin/rails db:prepare
 bin/rails db:seed
 
-4. Iniciar el servidor local:
+# 4. Levantar el servidor (puerto 3000)
 bin/rails server
+```
 
-La aplicación quedará disponible en http://localhost:3000.
-
----
-
-## Cuentas y Accesos Preconfigurados
-
-Los datos sembrados por defecto en db/seeds.rb proveen los siguientes usuarios de prueba:
-
-### Administrador (Acceso al Back-office)
-* URL de Ingreso: http://localhost:3000/login
-* Email: admin@sportshub.com
-* Password: password123
-* Permisos: Gestión integral de complejos, canchas y administración de reservas.
-
-### Cliente (Usuario de la API)
-* Email: client@sportshub.com
-* Password: password123
-* Uso: Autenticación vía endpoint para operar reservas.
+La API quedará disponible en: **`http://localhost:3000/api/v1`**
+El back-office admin en: **`http://localhost:3000/login`**
 
 ---
 
-## Documentación de la API (/api/v1)
+## Cuentas de Prueba (generadas por `db/seeds.rb`)
 
-Todos los endpoints retornan respuestas en formato JSON. Las rutas que requieran autenticación deben incluir el header:
-Authorization: Bearer <token_jwt>
-
-### Autenticación
-
-POST /api/v1/auth/login
-Headers: Content-Type: application/json
-Body:
-{
-  "email": "client@sportshub.com",
-  "password": "password123"
-}
-
-Respuesta exitosa (200 OK):
-{
-  "token": "eyJhbGciOiJIUzI1NiJ9...",
-  "user": {
-    "id": 2,
-    "name": "Cliente de Prueba",
-    "email": "client@sportshub.com",
-    "role": "client"
-  }
-}
+| Rol | Email | Password |
+|:---|:---|:---|
+| Administrador | `admin@sportshub.com` | `password123` |
+| Cliente API | `client@sportshub.com` | `password123` |
 
 ---
 
-### Complejos y Canchas
+## Arquitectura y Estructura
 
-GET /api/v1/sports_complexes
-Respuesta (200 OK): Lista de complejos deportivos con información básica.
-
-GET /api/v1/sports_complexes/:id
-Respuesta (200 OK): Información detallada del complejo seleccionado.
-
-GET /api/v1/sports_complexes/:sports_complex_id/courts
-Respuesta (200 OK): Listado de canchas pertenecientes al complejo.
-
-GET /api/v1/sports_complexes/:sports_complex_id/courts/:id
-Respuesta (200 OK): Detalle específico de la cancha.
-
----
-
-### Reservas (Requiere Autenticación)
-
-GET /api/v1/reservations
-Headers: Authorization: Bearer <token>
-Respuesta (200 OK): Listado de reservas asociadas al usuario autenticado, ordenadas cronológicamente.
-
-GET /api/v1/reservations/:id
-Headers: Authorization: Bearer <token>
-Respuesta (200 OK): Detalle de la reserva solicitada (solo accesible por su titular).
-
-POST /api/v1/reservations
-Headers:
-  Authorization: Bearer <token>
-  Content-Type: application/json
-Body:
-{
-  "reservation": {
-    "court_id": 1,
-    "reservation_date": "2026-10-15",
-    "start_time": "2026-10-15 18:00:00",
-    "end_time": "2026-10-15 19:00:00"
-  }
-}
-
-Respuesta exitosa (201 Created): Objeto de la reserva creada con importe calculado y estado inicial.
-
-Respuesta de error por solapamiento (422 Unprocessable Entity):
-{
-  "errors": [
-    "La cancha ya se encuentra reservada en el horario seleccionado"
-  ]
-}
+```
+app/
+├── controllers/
+│   ├── admin/                    # Back-office (MVC tradicional)
+│   │   ├── dashboard_controller.rb
+│   │   ├── courts_controller.rb
+│   │   ├── pricing_schemes_controller.rb
+│   │   ├── reservations_controller.rb
+│   │   └── sports_complexes_controller.rb
+│   └── api/v1/                   # API RESTful JSON
+│       ├── base_controller.rb    # Autenticación JWT centralizada
+│       ├── authentication_controller.rb  # Login, Register, Me
+│       ├── sports_controller.rb
+│       ├── sports_complexes_controller.rb
+│       ├── courts_controller.rb  # Filtros + disponibilidad + precios
+│       ├── reservations_controller.rb
+│       └── deposits_controller.rb        # Seña + webhook de pago
+├── models/
+│   ├── user.rb                   # Roles: admin / client
+│   ├── sports_complex.rb         # Complejo deportivo (con Active Storage)
+│   ├── court.rb                  # Cancha, precios dinámicos, disponibilidad
+│   ├── sport.rb                  # Catálogo de disciplinas
+│   ├── time_slot.rb              # Franja horaria por día de la semana
+│   ├── pricing_scheme.rb         # Esquema de tarifas
+│   ├── pricing_rule.rb           # Regla de multiplicador (día + rango horario)
+│   └── reservation.rb            # Turno reservado (estados + seña)
+└── views/
+    ├── admin/                    # Vistas ERB del back-office
+    └── api/v1/courts/            # Vistas Jbuilder para la API JSON
+```
 
 ---
 
-## Arquitectura y Modelo de Datos
+## Modelo de Datos (Entidades Principales)
 
-La persistencia del sistema se apoya en los siguientes modelos principales y sus asociaciones:
-
-* User: Maneja credenciales cifradas con has_secure_password, control de roles (admin, client) y la relación con reservas.
-* SportsComplex: Agrupa instalaciones deportivas, se vincula a una ciudad y soporta una imagen de portada (cover_photo) administrada mediante Active Storage.
-* Court: Representa el espacio físico reservable; pertenece a un complejo y a un deporte, y cuenta con imagen adjunta (image).
-* Sport: Catálogo de disciplinas (Fútbol, Tenis, Pádel, etc.) vinculadas a las canchas.
-* Reservation: Registra el turno solicitado por un usuario para una cancha específica en fecha y franja horaria determinadas, con estados (pending, confirmed, cancelled).
-* City / Province: Normalización geográfica para la ubicación de los complejos.
+```
+User ──< Reservation >── Court ──< TimeSlot
+                           │
+                     SportsComplex
+                           │
+                     PricingScheme ──< PricingRule
+                           │
+                          Sport
+```
 
 ---
 
-## Pruebas y Análisis de Calidad
+## Contrato de la API
 
-Ejecutar la suite completa de tests automatizados:
+Documentación completa de endpoints, parámetros, ejemplos JSON y códigos de respuesta:
+
+👉 **[API_CONTRACT.md](./API_CONTRACT.md)**
+
+---
+
+## Comandos de Desarrollo
+
+```bash
+# Tests automatizados (103 tests)
 bin/rails test
 
-Inspección de código y estilo con RuboCop:
+# Linter de código (RuboCop)
 bundle exec rubocop
 
-Auditoría estática de seguridad con Brakeman:
+# Auditoría de seguridad (Brakeman)
 bundle exec brakeman --no-pager --summary
+
+# Consola Rails
+bin/rails console
+
+# Resetear base de datos
+bin/rails db:reset
+```
+
+---
+
+## Variables de Entorno
+
+Para producción, configurar en `config/credentials.yml.enc`:
+
+```
+SECRET_KEY_BASE=<clave secreta de Rails>
+JWT_SECRET=<clave para firmar tokens JWT>
+```
+
+---
+
+## Ramas Git
+
+| Rama | Descripción |
+|:---|:---|
+| `main` | Base estable — TP Nº 1 entregado |
+| `feature/tp2-api-integration` | Integración con el frontend — TP Nº 2 |
+| `feature/pagos-seña` | Funcionalidad de pagos del back-office |
+
+---
+
+## Proyectos Relacionados
+
+- **Frontend React:** [sports-hub-frontend](https://github.com/lautaro0811-sketch/sports-hub-frontend)
