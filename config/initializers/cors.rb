@@ -10,7 +10,10 @@ Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
     origins "http://localhost:5173", "http://127.0.0.1:5173",
             "http://localhost:3000", "http://127.0.0.1:3000",
-            "http://localhost:4173", "http://127.0.0.1:4173"
+            "http://localhost:4173", "http://127.0.0.1:4173",
+            "https://sports-hub-frontend-woad.vercel.app",
+            /\Ahttps:\/\/sports-hub-frontend.*\.vercel\.app\z/,
+            *(ENV["FRONTEND_URL"].present? ? [ENV["FRONTEND_URL"]] : [])
 
     resource "/api/*",
              headers: :any,
