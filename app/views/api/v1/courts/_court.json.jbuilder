@@ -20,6 +20,7 @@ if court.sports_complex.present?
     json.name court.sports_complex.name
     json.address court.sports_complex.address
     json.city court.sports_complex.city
+    json.cover_photo_url court.sports_complex.cover_photo_url
   end
 else
   json.sports_complex nil

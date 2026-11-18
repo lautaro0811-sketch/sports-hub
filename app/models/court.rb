@@ -131,8 +131,10 @@ class Court < ApplicationRecord
   end
 
   def image_url
-    return unless image.attached?
-
-    Rails.application.routes.url_helpers.rails_blob_path(image, only_path: true)
+    if image.attached?
+      Rails.application.routes.url_helpers.rails_blob_path(image, only_path: true)
+    elsif sports_complex&.cover_photo&.attached?
+      Rails.application.routes.url_helpers.rails_blob_path(sports_complex.cover_photo, only_path: true)
+    end
   end
 end
